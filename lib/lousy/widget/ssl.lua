@@ -14,10 +14,26 @@ local wc = require("lousy.widget.common")
 
 local _M = {}
 
+-- Loaded lazily: error_page pulls in chrome and webview, and this widget is
+-- built while those are still being set up.
+local function has_exception (uri)
+    local error_page = package.loaded.error_page
+    if not error_page or not error_page.has_certificate_exception then return false end
+    local ok, host = pcall(function () return lousy.uri.parse(uri).host end)
+    return ok and error_page.has_certificate_exception(host) or false
+end
+
 local widgets = {
     update = function (w, ssl)
         local trusted = w.view:ssl_trusted()
-        if trusted == true then
+        if trusted == true and has_exception(w.view.uri) then
+            -- WebKit reports no certificate errors once it has been told to
+            -- allow one, so a certificate the user waved through looks exactly
+            -- like one that verified. It is not the same thing.
+            ssl.fg = theme.notrust_fg
+            ssl.text = "(exception)"
+            ssl:show()
+        elseif trusted == true then
             ssl.fg = theme.trust_fg
             ssl.text = "(trust)"
             ssl:show()

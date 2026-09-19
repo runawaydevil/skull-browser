@@ -34,6 +34,17 @@ local error_page_wm = require_web_module("error_page_wm")
 -- @readwrite
 _M.cert_db_path = luakit.data_dir .. "/allowed_certificates.db"
 
+--- How long a stored certificate exception stays valid, in seconds.
+--
+-- An exception is a decision to trust one certificate that failed
+-- verification. Keeping it forever means a certificate the user waved through
+-- once is still trusted long after the reason for it is gone, so it lapses and
+-- has to be made again.
+--
+-- @type number
+-- @readwrite
+_M.cert_exception_lifetime = 90 * 24 * 60 * 60
+
 --- Connect to and initialize the bookmarks database.
 local function init_cert_db()
     _M.cert_db = sqlite3{ filename = _M.cert_db_path }
@@ -54,6 +65,64 @@ local function init_cert_db()
 end
 init_cert_db()
 _M.cert_db:exec("UPDATE allowed_certificates SET allowed = 0")
+
+--- Drop stored exceptions older than `cert_exception_lifetime`.
+-- @treturn number The number of exceptions removed.
+_M.expire_certificate_exceptions = function ()
+    local cutoff = os.time() - _M.cert_exception_lifetime
+    local stale = _M.cert_db:exec(
+        "SELECT COUNT(*) AS n FROM allowed_certificates WHERE created < ?", {cutoff})
+    local n = tonumber(stale and stale[1] and stale[1].n) or 0
+    if n > 0 then
+        _M.cert_db:exec("DELETE FROM allowed_certificates WHERE created < ?", {cutoff})
+        msg.info("dropped %d expired certificate exception%s", n, n == 1 and "" or "s")
+    end
+    return n
+end
+
+--- List every stored certificate exception.
+-- @treturn table Rows with `host`, `created` and `expires` fields.
+_M.certificate_exceptions = function ()
+    _M.expire_certificate_exceptions()
+    local rows = _M.cert_db:exec(
+        "SELECT host, created FROM allowed_certificates ORDER BY created DESC") or {}
+    for _, row in ipairs(rows) do
+        row.created = tonumber(row.created) or 0
+        row.expires = row.created + _M.cert_exception_lifetime
+    end
+    return rows
+end
+
+--- Whether a host is being trusted because of a stored exception rather than
+-- because its certificate verified.
+-- @tparam string host The host to look up.
+-- @treturn boolean
+_M.has_certificate_exception = function (host)
+    if not host or host == "" then return false end
+    local rows = _M.cert_db:exec(
+        "SELECT 1 AS present FROM allowed_certificates WHERE host=? AND created >= ?",
+        {host, os.time() - _M.cert_exception_lifetime})
+    return rows ~= nil and #rows > 0
+end
+
+--- Remove a stored certificate exception.
+--
+-- WebKit keeps the certificate it was told to allow until the browser is
+-- restarted, so the warning comes back on the next run rather than at once.
+--
+-- @tparam string host The host whose exception should be dropped.
+-- @treturn boolean Whether a row was removed.
+_M.remove_certificate_exception = function (host)
+    assert(type(host) == "string" and host ~= "", "expected a host name")
+    local before = _M.cert_db:exec(
+        "SELECT COUNT(*) AS n FROM allowed_certificates WHERE host=?", {host})
+    local n = tonumber(before and before[1] and before[1].n) or 0
+    if n == 0 then return false end
+    _M.cert_db:exec("DELETE FROM allowed_certificates WHERE host=?", {host})
+    return true
+end
+
+_M.expire_certificate_exceptions()
 
 --- HTML template for error page content.
 -- @type string
@@ -312,7 +381,9 @@ local function get_cert_error_desc(err)
             .. " site that it was retrieved from.",
         ["not-activated"] = "The certificate's activation time is still in the future.",
         expired = "The certificate has expired.",
-        insecure = "The certificate has been revoked.",
+        revoked = "The certificate has been revoked.",
+        insecure = "The certificate was signed with an algorithm that is"
+            .. " considered insecure.",
         ["generic-error"] = "Error not specified.",
     }
 
@@ -357,7 +428,9 @@ local function handle_error(v, uri, err)
         -- yet. if there's no such certificates in db -- show error
         -- page
         local host = lousy.uri.parse(v.uri).host
-        local certs = _M.cert_db:exec("SELECT cert AS cert FROM allowed_certificates WHERE host=? and allowed=0",
+        _M.expire_certificate_exceptions()
+        local certs = _M.cert_db:exec(
+            "SELECT cert AS cert FROM allowed_certificates WHERE host=? AND allowed=0",
             {host})
         if certs and #certs > 0 then
             luakit.allow_certificate(host, certs[1].cert)
@@ -383,7 +456,8 @@ local function handle_error(v, uri, err)
                 end,
             },
             {
-                label = "Ignore danger permanently",
+                label = string.format("Trust this certificate for %d days",
+                    math.floor(_M.cert_exception_lifetime / 86400)),
                 callback = function(vv)
                     luakit.allow_certificate(host, cert)
                     -- save certificate to trusted store

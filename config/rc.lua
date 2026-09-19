@@ -177,6 +177,10 @@ require_web_module("referer_control_wm")
 
 local error_page = require "error_page"
 
+-- Add skull://certs/ chrome page, which lists and revokes the certificates
+-- that were trusted after failing verification
+local certs_chrome = require "certs_chrome"
+
 -- Add userstyles loader
 local styles = require "styles"
 

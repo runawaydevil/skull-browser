@@ -67,6 +67,130 @@ _M.pickle = function(t)
     return Pickle:clone():pickle_(t)
 end
 
+-- Escape sequences string.format("%q") can emit, plus the rest of the Lua set.
+local string_escapes = {
+    a = "\a", b = "\b", f = "\f", n = "\n",
+    r = "\r", t = "\t", v = "\v",
+    ["\\"] = "\\", ['"'] = '"', ["'"] = "'",
+}
+
+-- Read a pickled string without executing it.
+--
+-- The previous implementation ran the payload through loadstring, which turned
+-- every caller into a code execution sink: the session file, the command
+-- history, the settings file, and worst of all the single instance D-Bus
+-- channel, which any process on the user's session bus can write to.
+--
+-- This reader accepts only what pickle() emits: table literals, string, number
+-- and boolean literals, and {n} table references. No call, no operator and no
+-- identifier other than true/false/nil is reachable.
+local function parse(s)
+    local pos, depth = 1, 0
+
+    local function fail(what)
+        error(("malformed pickle at offset %d: %s"):format(pos, what), 0)
+    end
+
+    local function skip_space()
+        pos = s:find("[^ \t\r\n]", pos) or #s + 1
+    end
+
+    local function accept(ch)
+        skip_space()
+        if s:sub(pos, pos) == ch then pos = pos + 1 return true end
+        return false
+    end
+
+    local function expect(ch)
+        if not accept(ch) then fail("expected '" .. ch .. "'") end
+    end
+
+    local function parse_string()
+        pos = pos + 1 -- opening quote
+        local out = {}
+        while true do
+            local c = s:sub(pos, pos)
+            if c == "" then fail("unterminated string") end
+            if c == '"' then pos = pos + 1 break end
+            if c == "\\" then
+                local nxt = s:sub(pos + 1, pos + 1)
+                local digits = s:match("^%d%d?%d?", pos + 1)
+                if digits then
+                    out[#out + 1] = string.char(tonumber(digits))
+                    pos = pos + 1 + #digits
+                elseif nxt == "\n" then
+                    -- %q writes a real newline escaped by a backslash
+                    out[#out + 1] = "\n"
+                    pos = pos + 2
+                elseif string_escapes[nxt] then
+                    out[#out + 1] = string_escapes[nxt]
+                    pos = pos + 2
+                else
+                    fail("unknown escape")
+                end
+            else
+                out[#out + 1] = c
+                pos = pos + 1
+            end
+        end
+        return table.concat(out)
+    end
+
+    local parse_value
+
+    local function parse_table()
+        depth = depth + 1
+        if depth > 64 then fail("nesting too deep") end
+        expect("{")
+        local t = {}
+        while true do
+            if accept("}") then break end
+            if accept("[") then
+                local k = parse_value()
+                expect("]")
+                expect("=")
+                t[k] = parse_value()
+            else
+                t[#t + 1] = parse_value()
+            end
+            if not accept(",") then
+                expect("}")
+                break
+            end
+        end
+        depth = depth - 1
+        return t
+    end
+
+    parse_value = function ()
+        skip_space()
+        local c = s:sub(pos, pos)
+        if c == '"' then return parse_string() end
+        if c == "{" then
+            -- A bare {n} is a reference to the n-th table, not a literal.
+            local ref, after = s:match("^{%s*(%d+)%s*}()", pos)
+            if ref then pos = after return { tonumber(ref) } end
+            return parse_table()
+        end
+        local word, after = s:match("^([%a_][%w_]*)()", pos)
+        if word then
+            if word == "true" then pos = after return true end
+            if word == "false" then pos = after return false end
+            if word == "nil" then pos = after return nil end
+            fail("unexpected identifier")
+        end
+        local num
+        num, after = s:match("^(%-?%d+%.?%d*[eE]?[%+%-]?%d*)()", pos)
+        if num and tonumber(num) then pos = after return tonumber(num) end
+        fail("unexpected character")
+    end
+
+    local value = parse_value()
+    skip_space()
+    if pos <= #s then fail("trailing data") end
+    return value
+end
+
 --- Convert a string previously created with `pickle()` to a table.
 -- @tparam string s The string previously created with `pickle()`.
 -- @treturn table A table corresponding to the given string.
@@ -74,8 +198,8 @@ _M.unpickle = function(s)
     if type(s) ~= "string" then
         error("can't unpickle a "..type(s)..", only strings")
     end
-    local gentables = loadstring("return "..s)
-    local tables = gentables()
+    local tables = parse(s)
+    if type(tables) ~= "table" then error("pickle did not contain a table", 0) end
 
     for tnum = 1, table.getn(tables) do
         local t = tables[tnum]

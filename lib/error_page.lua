@@ -18,6 +18,10 @@ local _M = {}
 -- Valores vindos de fora -- URI, mensagem do WebKit, erro de socket -- nao
 -- podem chegar crus ao template: as chaves sao lidas como placeholder e o
 -- resto vira markup vivo. Local de proposito: nao e API publica.
+-- Fields that legitimately hold HTML. Everything else reaching the template is
+-- treated as data.
+local markup_fields = { content = true, style = true, buttons = true }
+
 local function safe_text(v)
     if v == nil then return nil end
     return (lousy.util.escape(tostring(v)):gsub("[{}]", { ["{"] = "&#123;", ["}"] = "&#125;" }))
@@ -247,6 +251,22 @@ local function load_error_page(v, error_page_info)
         error_page_info.style = _M.style .. error_page_info.style
     end
     error_page_info = lousy.util.table.join(defaults, error_page_info)
+    -- Escape every field the caller supplied, except the three that carry
+    -- markup by design. Callers pass a blocked URI, a requested path, a page
+    -- name; without this each one has to remember to escape, and the ones that
+    -- forgot were reachable from a remote page with scripts enabled.
+    for key, val in pairs(error_page_info) do
+        if not markup_fields[key] then
+            if type(val) == "string" then
+                error_page_info[key] = safe_text(val)
+            elseif type(val) == "table" and key == "msg" then
+                local out = {}
+                for i, line in ipairs(val) do out[i] = safe_text(line) end
+                error_page_info[key] = out
+            end
+        end
+    end
+
     error_page_info.buttons = make_button_html(v, error_page_info.buttons)
 
     -- Make msg html
@@ -323,7 +343,7 @@ local function handle_error(v, uri, err)
     local error_page_info
     if category == "generic" then
         error_page_info = {
-            msg = safe_text(err.message),
+            msg = err.message,
         }
         -- Add proxy info on generic pages
         local p = soup.proxy_uri
@@ -391,7 +411,7 @@ local function handle_error(v, uri, err)
             }},
         }
     end
-    error_page_info.uri = safe_text(uri)
+    error_page_info.uri = uri
 
     load_error_page(v, error_page_info)
 end

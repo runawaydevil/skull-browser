@@ -224,6 +224,11 @@ local help_doc_page = function (v, path, request)
 
     local extract_doc_html = function (file)
         local prefix = luakit.dev_paths and "doc/apidocs/" or (luakit.install_paths.doc_dir .. "/")
+        -- The path comes straight from the URI. Without this an absolute path
+        -- or a .. segment reads outside the documentation directory.
+        if file:match("^/") or file:match("%.%.") then
+            return nil, file
+        end
         local ok, blob = pcall(lousy.load, prefix .. file)
         if not ok then return nil, prefix .. file end
         local style = blob:match("<style>(.*)</style>")
@@ -311,7 +316,10 @@ local help_doc_page = function (v, path, request)
         local file = doc_style
         error_page.show_error_page(v, {
             heading = "Documentation not found",
-            content = "Opening <code>" .. file .. "</code> failed",
+            -- Passed as a field, not concatenated: load_error_page escapes
+            -- everything except content, style and buttons.
+            content = "Opening <code>{file}</code> failed",
+            file = file,
             buttons = { path ~= "index.html" and {
                 label = "Return to API Index",
                 callback = function (vv) vv.uri = "skull://help/doc/index.html" end

@@ -29,3 +29,6 @@ cscope.*
 /skull
 /skull.so
 /skull.1
+
+# downloaded packages, never part of the tree
+*.deb

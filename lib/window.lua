@@ -817,7 +817,7 @@ settings.register_settings({
     },
     ["window.home_page"] = {
         type = "string",
-        default = "https://luakit.github.io/",
+        default = "skull://newtab/",
         desc = "The URI of the home page.",
     },
     ["window.new_tab_page"] = {
@@ -840,14 +840,18 @@ settings.register_settings({
     },
     ["window.search_engines"] = {
         type = "string:",
+        -- Buscadores independentes por padrao. SearXNG e metabusca que
+        -- qualquer um pode hospedar; Marginalia e Wiby indexam a web pequena
+        -- e textual; Mojeek tem rastreador proprio. Nenhum revende Google.
         default = {
-            duckduckgo  = "https://duckduckgo.com/?q=%s",
-            github      = "https://github.com/search?q=%s",
-            google      = "https://google.com/search?q=%s",
-            imdb        = "http://www.imdb.com/find?s=all&q=%s",
+            sx          = "https://searx.be/search?q=%s",
+            marginalia  = "https://marginalia-search.com/search?query=%s",
+            mojeek      = "https://www.mojeek.com/search?q=%s",
+            wiby        = "https://wiby.me/?q=%s",
             wikipedia   = "https://en.wikipedia.org/wiki/Special:Search?search=%s",
+            github      = "https://github.com/search?q=%s",
 
-            default     = "https://google.com/search?q=%s",
+            default     = "https://searx.be/search?q=%s",
         },
         desc = "The set of search engine shortcuts.",
         formatter = function (t, k)

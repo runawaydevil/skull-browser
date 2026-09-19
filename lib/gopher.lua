@@ -77,7 +77,10 @@ _M.parse_gopher_line = function(line, url)
     end
     ret.display_string = fields[1] or ""
     ret.selector = fields[2] or ""
-    ret.host = fields[3] or url.host
+    -- Campos vem crus do servidor remoto. A porta ja era filtrada; o host
+    -- nao era, e entrava direto num atributo href.
+    ret.host = (fields[3] or url.host):gsub("[^%w%.%-]", "")
+    if ret.host == "" then ret.host = url.host end
     ret.port = (fields[4] or tostring(url.port)):gsub("[^0-9]", "")
     ret.scheme = "gopher"
     if ret.item_type == "T" or ret.item_type == "8" then
@@ -87,11 +90,24 @@ _M.parse_gopher_line = function(line, url)
 end
 local parse_gopher_line = _M.parse_gopher_line
 
+-- Esquemas aceitos no prefixo URL: de um item de menu. Sem esta lista um
+-- servidor hostil devolve javascript: ou data: e o link vira execucao.
+local allowed_schemes = {
+    gopher = true, gemini = true, http = true, https = true,
+    telnet = true, mailto = true, ftp = true, finger = true,
+}
+
 --- Evaluate hyperlink for a gopher menu entry.
 -- @tparam table entry Gopher menu entry structure from parse_gopher_line().
 -- @treturn string Valid URL for the menu entry.
 _M.href_source = function(entry)
     local src = entry.selector:match("^/?URL:(.+)$")
+    if src then
+        local scheme = src:match("^%s*([%w%+%-%.]+):")
+        if not scheme or not allowed_schemes[scheme:lower()] then
+            src = nil
+        end
+    end
     if not src then
         if entry.scheme == "telnet" then
             src = ([[telnet://%s:%s/]]):format(entry.host, entry.port)
@@ -171,7 +187,7 @@ local function text_to_html(data, url)
     return [[
         <html>
         <head>
-            <title>]] .. url.title .. [[</title>
+            <title>]] .. lousy.util.escape(url.title) .. [[</title>
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
             ]] .. stylesheet() .. [[
         </head>
@@ -191,7 +207,7 @@ end
 local function menu_html_header(title)
     return [[
         <head>
-            <title>]] .. title .. [[</title>
+            <title>]] .. lousy.util.escape(title) .. [[</title>
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
             ]] .. stylesheet() .. [[
             <script type="text/javascript">
@@ -229,7 +245,7 @@ local function menu_to_html(data, url)
             if entry.item_type ~= "7" then input = "" end
             html[#html + 1] = ([[%s <a href="%s" id="%s">%s</a>%s]]):format(
                 type_text,
-                src,
+                lousy.util.escape(src),
                 anchor_name,
                 lousy.util.escape(entry.display_string),
                 input

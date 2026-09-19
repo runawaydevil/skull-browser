@@ -15,6 +15,14 @@ local history = require("history")
 
 local _M = {}
 
+-- Valores vindos de fora -- URI, mensagem do WebKit, erro de socket -- nao
+-- podem chegar crus ao template: as chaves sao lidas como placeholder e o
+-- resto vira markup vivo. Local de proposito: nao e API publica.
+local function safe_text(v)
+    if v == nil then return nil end
+    return (lousy.util.escape(tostring(v)):gsub("[{}]", { ["{"] = "&#123;", ["}"] = "&#125;" }))
+end
+
 local error_page_wm = require_web_module("error_page_wm")
 
 --- Path to the whitelist of allowed invalid certificates.
@@ -248,11 +256,16 @@ local function load_error_page(v, error_page_info)
         error_page_info.msg = "<p>" .. table.concat(msg, "</p><p>") .. "</p>"
     end
 
-    -- Substitute values recursively
-    local html, nsub = _M.html_template
-    repeat
+    -- Substituicao repetida porque um valor pode conter placeholder de outro
+    -- ({content} traz {uri} e {msg}). O limite existe porque gsub com tabela
+    -- conta a ocorrencia mesmo quando a chave nao existe e nada e substituido:
+    -- sem o teto, um unico {palavra} desconhecido trava aqui para sempre.
+    local html = _M.html_template
+    for _ = 1, 8 do
+        local nsub
         html, nsub = string.gsub(html, "{([%w_]+)}", error_page_info)
-    until nsub == 0
+        if nsub == 0 then break end
+    end
 
     -- If v.is_loading = true then the load will first be stopped, causing a finish
     -- event to fire. The error page will then be loaded; so the _second_ finish
@@ -310,7 +323,7 @@ local function handle_error(v, uri, err)
     local error_page_info
     if category == "generic" then
         error_page_info = {
-            msg = err.message,
+            msg = safe_text(err.message),
         }
         -- Add proxy info on generic pages
         local p = soup.proxy_uri
@@ -378,7 +391,7 @@ local function handle_error(v, uri, err)
             }},
         }
     end
-    error_page_info.uri = uri
+    error_page_info.uri = safe_text(uri)
 
     load_error_page(v, error_page_info)
 end

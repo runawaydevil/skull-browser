@@ -88,6 +88,30 @@ T.test_lousy_util_lua_escape = function ()
     end
 end
 
+T.test_lousy_util_shell_escape = function ()
+    -- luakit.spawn and luakit.spawn_sync both run the command through
+    -- g_shell_parse_argv, so this checks the real property: whatever goes in
+    -- comes back out as one argument, unchanged and never interpreted.
+    local hostile = {
+        "plain.css",
+        "with space.css",
+        "it's.css",
+        "'; touch /tmp/skull-shell-escape-failed; echo '.css",
+        '"; rm -rf /; echo "',
+        "back\\slash.css",
+        "$HOME/`id`/${PATH}.css",
+        "semi;colon|pipe&amp.css",
+    }
+
+    for _, path in ipairs(hostile) do
+        local _, out = luakit.spawn_sync("printf %s " .. lousy.util.shell_escape(path))
+        assert.equal(path, out)
+    end
+
+    -- The payload above would have created this file had the quoting failed.
+    assert.is_nil(lfs.attributes("/tmp/skull-shell-escape-failed"))
+end
+
 return T
 
 -- vim: et:sw=4:ts=8:sts=4:tw=80

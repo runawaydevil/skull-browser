@@ -121,13 +121,16 @@ local log_entry_fmt = ([==[
     ]==]):gsub("\n +", ""):gsub("^ +", ""):gsub(" +$", "")
 local build_log_entry_html = function (entry)
     assert(entry)
+    local escape = lousy.util.escape
+    -- Log lines quote uris and server replies, so they are page controlled
+    -- even though the log itself is ours.
     return log_entry_fmt:gsub("{(%w+)}", {
         time = string.format("%012f", entry.time),
-        llevel = entry.level,
-        level = entry.level:gsub("^%l", string.upper),
-        group = entry.group,
-        groupkey = entry.group:gsub("/","-"),
-        msg = entry.msg,
+        llevel = escape(entry.level),
+        level = escape((entry.level:gsub("^%l", string.upper))),
+        group = escape(entry.group),
+        groupkey = escape((entry.group:gsub("/","-"))),
+        msg = escape(entry.msg),
     })
 end
 

@@ -410,6 +410,22 @@ function _M.sql_escape(s)
     return "'" .. rstring.gsub(s or "", "'", "''") .. "'"
 end
 
+--- Escape a value for a shell command line.
+--
+-- Wraps the string in single quotes and rewrites any single quote it holds
+-- as <code>'\''</code>, which closes the quoted run, passes one literal
+-- quote, and opens the next run.
+--
+-- `luakit.spawn` splits its argument the way a shell would before handing
+-- the pieces to exec, so even a command that never reaches a shell needs
+-- its arguments quoted.
+--
+-- @tparam string s A string.
+-- @treturn string The quoted string, ready to be concatenated into a command.
+function _M.shell_escape(s)
+    return "'" .. rstring.gsub(tostring(s or ""), "'", "'\\''") .. "'"
+end
+
 --- Escape values for lua patterns.
 --
 -- Escapes the magic characters <code>^$()%.[]*+-?)</code> by prepending a

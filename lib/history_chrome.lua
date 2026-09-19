@@ -173,13 +173,13 @@ window.addEventListener('load', () => {
         }
 
         return `
-            <div class=item data-id="${h.id}">
-                <span class=time>${h.time}</span>
+            <div class=item data-id="${escapeHTML(h.id)}">
+                <span class=time>${escapeHTML(h.time)}</span>
                 <span class=title>
-                    <a href="${h.uri}">${escapeHTML(h.title || h.uri)}</a>
+                    <a href="${escapeHTML(h.uri)}">${escapeHTML(h.title || h.uri)}</a>
                 </span>
                 <span class=domain>
-                    <a href=#>${domain}</a>
+                    <a href=#>${escapeHTML(domain)}</a>
                 </span>
             </div>
         `

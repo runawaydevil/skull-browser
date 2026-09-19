@@ -133,15 +133,15 @@ function makeDownloadHTML (d) {
     }
 
     return `
-        <div class=download data-id="${d.id}" data-created="${d.created}">
-            <div class=date>${dateStr}</div>
+        <div class=download data-id="${escapeHTML(d.id)}" data-created="${escapeHTML(d.created)}">
+            <div class=date>${escapeHTML(dateStr)}</div>
             <div class=details>
                 <div class=title>
                     <a href="file://${escape(d.destination)}">${escapeHTML(href)}</a>
-                    <div class=status>${status_text}</div>
+                    <div class=status>${escapeHTML(status_text)}</div>
                 </div>
                 <div class=uri>
-                    <a href="${uri}">${uri}</a>
+                    <a href="${escapeHTML(uri)}">${escapeHTML(uri)}</a>
                 </div>
             </div>
             <div class=controls>

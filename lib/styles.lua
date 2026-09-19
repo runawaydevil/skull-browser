@@ -369,9 +369,24 @@ end
 -- = nil` to turn off the watch.
 -- @tparam string path the path of the watched style.
 _M.watch_styles = function (guard, path)
-    luakit.spawn(string.format("bash -c 'inotifywait -t 10 %q || sleep 1'", path), function ()
+    local function again ()
         _M.detect_files()
         if guard[1] then _M.watch_styles(guard, path) end
+    end
+
+    -- This used to run through `bash -c`, interpolating the path with Lua's
+    -- %q, which leaves the single quote alone. A stylesheet whose name held
+    -- one closed the quoting and the rest of the name ran as a command.
+    luakit.spawn("inotifywait -t 10 " .. lousy.util.shell_escape(path), function (_, status)
+        if status == 0 then return again() end
+        -- inotifywait timed out or is not installed: pause before looking
+        -- again, so a missing tool does not spin the loop.
+        local retry = timer{ interval = 1000 }
+        retry:add_signal("timeout", function ()
+            retry:stop()
+            again()
+        end)
+        retry:start()
     end)
 end
 

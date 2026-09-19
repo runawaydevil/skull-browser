@@ -308,17 +308,17 @@ window.addEventListener('load', () => {
         }
 
         return `
-            <div class=bookmark data-id="${b.id}">
+            <div class=bookmark data-id="${escapeHTML(b.id)}">
                 <div class=title>
-                    <a href="${b.uri}">${escapeHTML(b.title || b.uri)}</a>
+                    <a href="${escapeHTML(b.uri)}">${escapeHTML(b.title || b.uri)}</a>
                 </div>
-                <div class=uri style="${b.title ? 'display: block;' : ''}">${b.uri}</div>
+                <div class=uri style="${b.title ? 'display: block;' : ''}">${escapeHTML(b.uri)}</div>
                 <div class=desc style="${b.markdown_desc ? 'display: block;' : ''}">
                     ${b.markdown_desc}
                 </div>
                 <div class=bottom>
-                    <span class=date>${b.date}</span>
-                    <span class=tags>${ tagArray.map(tag => '<a href=#>'+tag+'</a>').join('') }</span>
+                    <span class=date>${escapeHTML(b.date)}</span>
+                    <span class=tags>${ tagArray.map(tag => '<a href=#>'+escapeHTML(tag)+'</a>').join('') }</span>
                     <span class=controls>
                         <a href=# class=edit>edit</a>
                         <a href=# class=delete>delete</a>

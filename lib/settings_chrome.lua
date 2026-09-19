@@ -53,12 +53,12 @@ local settings_chrome_JS = [=[
             value = i.checked;
             let span = root.querySelector(".input > label > span");
             span.dataset.value = value;
-            span.innerHTML = value ? "Enabled" : "Disabled";
+            span.textContent = value ? "Enabled" : "Disabled";
         } else
             value = i.value;
         set_setting(key, value, type).then(function(error) {
             root.classList.toggle("has-error", error)
-            root.querySelector(".error-message").innerHTML = error;
+            root.querySelector(".error-message").textContent = error;
         });
     }
     function on_click (event) {

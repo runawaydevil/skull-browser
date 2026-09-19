@@ -273,7 +273,11 @@ formfiller_wm:add_signal("add", function (_, view_id, str)
     local f = io.open(file, "a")
     f:write(str)
     f:close()
-    if not existed then os.execute(string.format("chmod 600 %q", file)) end
+    -- Not os.execute: that is a real shell, and Lua's %q leaves $ and the
+    -- backtick alone. luakit.spawn execs directly, with no shell at all.
+    if not existed then
+        luakit.spawn("chmod 600 " .. lousy.util.shell_escape(file))
+    end
     edit()
 end)
 

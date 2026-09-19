@@ -19,6 +19,8 @@
  */
 
 #include "common/util.h"
+#include <sys/stat.h>
+
 #include "globalconf.h"
 #include "luah.h"
 #include "ipc.h"
@@ -207,6 +209,11 @@ main(gint argc, gchar *argv[])
     globalconf.starttime = l_time();
 
     log_init();
+
+    /* History, bookmarks, cookies, sessions and saved forms all land on disk
+     * under this process. Only the cookie jar used to be narrowed, so the
+     * rest inherited whatever the login shell happened to set. */
+    umask(S_IRWXG | S_IRWXO);
 
     /* set numeric locale to C (required for compatibility with
        LuaJIT and luakit scripts) */

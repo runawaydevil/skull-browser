@@ -900,8 +900,10 @@ parse_uri(const gchar *uri) {
             return new;
         }
     }
-    /* default to http:// scheme */
-    return g_strdup_printf("http://%s", uri);
+    /* Default to https. A bare host used to become http://, so the very
+      * first request for a typed address went out in the clear and any
+      * redirect to https could be stripped on the way. */
+    return g_strdup_printf("https://%s", uri);
 }
 
 /* The __newindex method for the webview object */

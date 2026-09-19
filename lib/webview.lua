@@ -107,7 +107,9 @@ local init_funcs = {
     mime_decision = function (view)
         -- Return true to accept or false to reject from this signal.
         view:add_signal("mime-type-decision", function (_, uri, mime)
-            msg.info("Requested link: %s (%s)", uri, mime)
+            -- Verbose, not info: this fires for every request, private tabs
+            -- included, and the log goes to stderr and to skull://log.
+            msg.verbose("Requested link: %s (%s)", uri, mime)
             -- i.e. block binary files like *.exe
             --if mime == "application/octet-stream" then
             --    return false

@@ -60,18 +60,26 @@ luaH_soup_set_proxy_uri(lua_State *L)
     WebKitWebContext *ctx = web_context_get();
     WebKitWebsiteDataManager *dm = webkit_web_context_get_website_data_manager(ctx);
     const gchar *new_proxy_uri = lua_isnil(L, 3) ? "default" : luaL_checkstring(L, 3);
-    g_free(proxy_uri);
-    proxy_uri = g_strdup(new_proxy_uri);
 
-    if (!proxy_uri || g_str_equal(proxy_uri, "default")) {
+    if (g_str_equal(new_proxy_uri, "default")) {
         webkit_website_data_manager_set_network_proxy_settings(dm, WEBKIT_NETWORK_PROXY_MODE_DEFAULT, NULL);
-    } else if (g_str_equal(proxy_uri, "no_proxy")) {
+    } else if (g_str_equal(new_proxy_uri, "no_proxy")) {
         webkit_website_data_manager_set_network_proxy_settings(dm, WEBKIT_NETWORK_PROXY_MODE_NO_PROXY, NULL);
     } else {
-        WebKitNetworkProxySettings *proxy_settings = webkit_network_proxy_settings_new(proxy_uri, NULL);
+        /* webkit_network_proxy_settings_new returns NULL for a uri it cannot
+         * parse. That NULL used to be handed straight on, which left the
+         * proxy unset while soup.proxy_uri still reported it: traffic went
+         * out direct and nothing said so. */
+        WebKitNetworkProxySettings *proxy_settings = webkit_network_proxy_settings_new(new_proxy_uri, NULL);
+        if (!proxy_settings)
+            luaL_error(L, "invalid proxy uri '%s'; the previous setting is unchanged", new_proxy_uri);
         webkit_website_data_manager_set_network_proxy_settings(dm, WEBKIT_NETWORK_PROXY_MODE_CUSTOM, proxy_settings);
         webkit_network_proxy_settings_free(proxy_settings);
     }
+
+    /* Only recorded once the setting actually took. */
+    g_free(proxy_uri);
+    proxy_uri = g_strdup(new_proxy_uri);
 }
 
 static void

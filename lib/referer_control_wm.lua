@@ -28,6 +28,14 @@
 
 local _M = {}
 
+local function scheme_from_uri(uri)
+    return (uri and string.match(string.lower(uri), "^(%a[%w+.-]*)://")) or ""
+end
+
+local function origin_from_uri(uri)
+    return (uri and string.match(uri, "^(%a[%w+.-]*://[^/]*)")) or nil
+end
+
 local function domain_from_uri(uri)
     local domain = (uri and string.match(string.lower(uri), "^%a+://([^/]*)/?"))
     -- Strip leading www. www2. etc
@@ -38,9 +46,28 @@ end
 luakit.add_signal("page-created", function(page)
     page:add_signal("send-request", function(p, _, headers)
         if not headers.Referer then return end
+
         if domain_from_uri(p.uri) ~= domain_from_uri(headers.Referer) then
             msg.verbose("Removing referer '%s'", headers.Referer)
             headers.Referer = nil
+            return
+        end
+
+        -- Leaving a secure page for an insecure one hands the address of the
+        -- secure page to anyone on the wire.
+        if scheme_from_uri(headers.Referer) == "https"
+                and scheme_from_uri(p.uri) ~= "https" then
+            msg.verbose("Removing referer on downgrade to %s", p.uri)
+            headers.Referer = nil
+            return
+        end
+
+        -- Same domain, so the header stays, but the path and the query do
+        -- not: those carry search terms, tokens and document names that the
+        -- server on the other end has no reason to receive twice.
+        local origin = origin_from_uri(headers.Referer)
+        if origin and origin .. "/" ~= headers.Referer then
+            headers.Referer = origin .. "/"
         end
     end)
 end)

@@ -159,8 +159,13 @@ end)
 --- Add a new download.
 -- @tparam string uri The URI to download.
 -- @tparam table opts A table of options.
-function _M.add(uri, opts)
+-- @tparam[opt] widget view The webview the download came from, used to keep
+-- downloads started in a private tab out of the database.
+function _M.add(uri, opts, view)
     opts = opts or {}
+    -- history.lua makes the same check on every visit. Downloads did not,
+    -- so a private tab still left the uri and the path on disk.
+    local private = (view and view.private) or false
     local d = (type(uri) == "string" and download{uri=uri}) or uri
 
     assert(type(d) == "download",
@@ -202,6 +207,7 @@ function _M.add(uri, opts)
     end)
 
     d:add_signal("finished", function(dd)
+        if private then return end
         query_insert:exec{os.time(), dls[dd].created, dd.uri, dd.destination, dd.total_size}
     end)
 end
@@ -340,7 +346,7 @@ add_cmds({
         func = function (w, o)
             local uri = o.arg or w.view.uri
             if uri and not uri:match("^skull://")
-                then _M.add(uri, { window = w.win })
+                then _M.add(uri, { window = w.win }, w.view)
             elseif uri then
                 w:error("cannot download URI '"..uri.."'")
             else

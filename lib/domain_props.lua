@@ -57,6 +57,11 @@
 --  - `draw_compositing_indicators`
 --  - `editable`
 --  - `enable_accelerated_2d_canvas`
+--
+--  Three of the names below are still accepted by WebKitGTK and still settable
+--  here, but WebKit no longer acts on them. They are kept so existing configs
+--  do not break; do not count on any of them for security.
+--
 --  - `enable_caret_browsing`
 --  - `enable_developer_extras`
 --  - `enable_dns_prefetching`
@@ -64,13 +69,13 @@
 --  - `enable_fullscreen`
 --  - `enable_html5_database`
 --  - `enable_html5_local_storage`
---  - `enable_hyperlink_auditing` (WebKitGTK < 2.50 only)
---  - `enable_java`
+--  - `enable_hyperlink_auditing`
+--  - `enable_java` (no effect: WebKit dropped Java applets)
 --  - `enable_javascript`
 --  - `enable_mediasource`
 --  - `enable_media_stream`
 --  - `enable_page_cache`
---  - `enable_plugins`
+--  - `enable_plugins` (no effect: WebKit dropped NPAPI plugins)
 --  - `enable_private_browsing`
 --  - `enable_resizable_text_areas`
 --  - `enable_site_specific_quirks`
@@ -80,7 +85,7 @@
 --  - `enable_webaudio`
 --  - `enable_webgl`
 --  - `enable_write_console_messages_to_stdout`
---  - `enable_xss_auditor`
+--  - `enable_xss_auditor` (no effect: the XSS auditor was removed from WebKit)
 --  - `fantasy_font_family`
 --  - `javascript_can_access_clipboard`
 --  - `javascript_can_open_windows_automatically`

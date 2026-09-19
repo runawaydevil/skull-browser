@@ -39,7 +39,7 @@ _M.stylesheet = [===[
             radial-gradient(ellipse at 50% 28%, #10281b 0%, transparent 62%),
             var(--bg);
     }
-    /* Varredura de tubo: sutil, so para o fundo nao ficar morto. */
+    /* Scanline sweep: faint, just enough that the background is not dead. */
     body::after {
         content: "";
         position: fixed;
@@ -99,8 +99,8 @@ _M.stylesheet = [===[
     }
 ]===]
 
--- O cranio, embutido: a pagina precisa funcionar sem depender de um handler
--- de recurso que hoje nao existe.
+-- The skull is inlined: the page has to render without depending on a
+-- resource handler that does not exist.
 local mark_svg = [==[
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
 <rect width="64" height="64" rx="14" fill="#050B07"/>

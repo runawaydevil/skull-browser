@@ -125,9 +125,9 @@ local function spawn_luakit_instance(config, ...)
         DISPLAY = xvfb_display
     }
 
-    -- env -i limpa tudo, entao repassar os caminhos de modulo Lua quando
-    -- existirem: sem isso nao da para rodar a suite com luassert instalado
-    -- fora do prefixo do sistema.
+    -- env -i clears everything, so pass the Lua module paths back through
+    -- when they are set. Without this the suite cannot run with luassert
+    -- installed outside the system prefix.
     for _, var in ipairs({ "LUA_PATH", "LUA_CPATH", "LD_LIBRARY_PATH" }) do
         local val = util.getenv(var)
         if val and val ~= "" then env[var] = "'" .. val .. "'" end
@@ -217,9 +217,9 @@ if git~=nil then
     end
 end
 
--- Reaproveitar um display existente quando pedido. Xvfb exige /tmp/.X11-unix
--- com dono e modo proprios e um xkbcomp em /usr/bin; nem todo ambiente tem
--- isso (WSLg, conteineres), e ali um X server ja esta no ar.
+-- Reuse an existing display when asked to. Xvfb wants /tmp/.X11-unix with
+-- its own owner and mode, and an xkbcomp in /usr/bin. Not every environment
+-- has either (WSLg, containers), and in those an X server is already up.
 local reuse_display = os.getenv("SKULL_TEST_DISPLAY")
 
 -- Find a free server number

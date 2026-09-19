@@ -98,6 +98,132 @@ of root keys and the whole interface follows.
 Requires `luassert`. The suite covers the Lua modules and the C bindings.
 
 
+## Security model
+
+Worth reading before you trust this with anything.
+
+### What it does by default
+
+    third-party cookies      blocked
+    DNS prefetching          off
+    WebGL, WebAudio          off
+    media capture            off
+    clipboard access by JS   denied
+    popups by JS             denied
+    developer tools          off
+    page permissions         denied
+    typed addresses          https, never http
+    Referer, cross-domain    dropped
+    Referer, same domain     cut back to the origin, no path or query
+    Referer on a downgrade   dropped
+    files written on disk    0600, the process runs under umask 0077
+    ad and tracker lists     EasyList, EasyPrivacy, EasyList Portuguese
+
+### What it does not do
+
+There is no sandbox around Lua. A module under `~/.config/skull/` runs in the
+browser process with every power your user account has: it can read your files,
+open sockets and start programs. That is the same deal as a window manager
+config, and it is what makes the browser worth using, but it means **a Lua
+module you did not read is a program you did not read**.
+
+The same applies to userscripts installed with `:usinstall`. They reach the
+bridge into Lua, so treat one from a web page as you would treat a shell script
+from a web page.
+
+JavaScript is on by default. Turn it off globally or per domain in `rc.lua`:
+
+    settings.webview.enable_javascript = false
+    settings.on["example.com"].webview.enable_javascript = true
+
+Saved form data, including passwords, is stored in `~/.local/share/skull/`
+as plain Lua that the browser executes on every page load. The file is 0600
+and the pattern is anchored to the page host, but it is not encrypted. If that
+matters to you, use a password manager and do not use `:formfiller`.
+
+### Certificates
+
+When a certificate fails verification you can trust it anyway. That choice
+covers one certificate on one host, not the host in general, so a different
+certificate on the same host warns again. The exception lapses after 90 days.
+
+    gC          list the stored exceptions
+    :certs      same thing
+
+While an exception is in force the status bar shows `(exception)` rather than
+`(trust)`, because the connection is not verified, it is excused.
+
+### Reporting something
+
+Open an issue at <https://github.com/runawaydevil/skull-browser/issues>. If it
+is a vulnerability rather than a bug, say so in the title and leave out the
+working payload until it is fixed.
+
+
+## Extending
+
+Everything above the C core is Lua, and the Lua is on your disk.
+
+    lib/             the modules that make up the browser
+    lib/*_wm.lua     modules that run inside WebKit's render process
+    lib/lousy/       widgets and utilities shared by the rest
+    config/rc.lua    what gets loaded, and in what order
+    widgets/         the C widgets exposed to Lua
+    clib/            the C libraries exposed to Lua
+
+A module is an ordinary Lua file returning a table. Drop it in
+`~/.config/skull/` and `require` it from your `rc.lua`.
+
+An internal page takes about ten lines:
+
+    local chrome = require "chrome"
+
+    chrome.add("hello", function ()
+        return "<html><body><h1>hello</h1></body></html>"
+    end)
+
+That gives you `skull://hello/`. Pass a table of functions as the fourth
+argument to `chrome.add` and they become callable from the page's JavaScript,
+returning promises. Only pages served from `skull://` can reach them.
+
+Key bindings and commands go through `modes`:
+
+    local modes = require "modes"
+
+    modes.add_binds("normal", {
+        { "^gh$", "Go home.", function (w) w:navigate("skull://newtab/") end },
+    })
+
+    modes.add_cmds({
+        { ":hello", "Say hello.", function (w) w:notify("hello") end },
+    })
+
+Type `:help` in the browser for the generated documentation, which covers
+every module, binding and setting present in your build.
+
+`docs/decisions/` holds the decisions that shaped the fork and the reasoning
+behind them. `001-webkitgtk-api.md` explains why nothing new should be written
+under `extension/`.
+
+
+## Contributing
+
+    make                     build
+    make run-tests           the whole suite
+    make apidoc              regenerate doc/apidocs
+
+The suite includes style checks. `luacheck` runs over every Lua file, trailing
+whitespace fails the build, and every exported module function needs a doc
+comment. Run the tests before sending anything; CI runs the same commands on
+push and on pull requests.
+
+Tests live in `tests/async/`, one file per module, each returning a table of
+`test_*` functions. A fix belongs with a test that fails without it.
+
+Commit messages say what changed and why, in English, present tense, with a
+short subject line and a body when the subject is not enough.
+
+
 ## License
 
 GNU GPLv3. See `COPYING.GPLv3`.

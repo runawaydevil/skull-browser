@@ -82,7 +82,7 @@ local function fetch(entry)
     end)
 
     if not ok then
-        msg.warn("adblock: nao consegui executar curl: %s", tostring(err))
+        msg.warn("adblock: could not run curl: %s", tostring(err))
         finish()
     end
 end

@@ -1,11 +1,11 @@
 #!/bin/sh
-# Instala as dependencias de build do Skull Browser.
+# Install the build dependencies for Skull Browser.
 #
-#   sh build-utils/setup-deps.sh          instala e verifica
-#   sh build-utils/setup-deps.sh --check  so verifica, nao instala
+#   sh build-utils/setup-deps.sh          install, then check
+#   sh build-utils/setup-deps.sh --check  check only, install nothing
 #
-# Suporta apt (Debian, Ubuntu), dnf (Fedora) e pacman (Arch, Omarchy).
-# Precisa de sudo para instalar. Repetir e seguro.
+# Handles apt (Debian, Ubuntu), dnf (Fedora) and pacman (Arch, Omarchy).
+# Installing needs sudo. Running it again is safe.
 
 set -eu
 
@@ -14,7 +14,7 @@ say() { printf '\n\033[1m==> %s\033[0m\n' "$1"; }
 CHECK_ONLY=0
 [ "${1:-}" = "--check" ] && CHECK_ONLY=1
 
-# --- que distro e esta -------------------------------------------------------
+# --- which distribution is this -------------------------------------------------------
 
 if command -v apt-get >/dev/null 2>&1; then
     FAMILY=debian
@@ -23,25 +23,25 @@ elif command -v dnf >/dev/null 2>&1; then
 elif command -v pacman >/dev/null 2>&1; then
     FAMILY=arch
 else
-    echo "Nao encontrei apt, dnf nem pacman." >&2
-    echo "Instale manualmente: gtk3, webkit2gtk 4.1, sqlite3, luajit," >&2
-    echo "lua-filesystem e lua-socket para Lua 5.1, gstreamer." >&2
+    echo "Found neither apt, dnf nor pacman." >&2
+    echo "Install by hand: gtk3, webkit2gtk 4.1, sqlite3, luajit," >&2
+    echo "lua-filesystem and lua-socket for Lua 5.1, gstreamer." >&2
     exit 1
 fi
 
 if [ -r /etc/os-release ]; then
     . /etc/os-release
-    say "Distro: ${PRETTY_NAME:-$FAMILY}  (familia $FAMILY)"
+    say "Distribution: ${PRETTY_NAME:-$FAMILY}  ($FAMILY family)"
 else
-    say "Familia de distro: $FAMILY"
+    say "Distribution family: $FAMILY"
 fi
 
-# --- pacotes por familia -----------------------------------------------------
+# --- packages, per family -----------------------------------------------------
 #
-# O que o config.mk exige via pkg-config: gtk+-3.0, gthread-2.0, webkit2gtk-4.1,
-# sqlite3, javascriptcoregtk-4.1 e luajit (ou lua5.1). Em tempo de execucao o
-# interpretador precisa achar lfs e socket -- e eles tem que ser da ABI 5.1,
-# nao da 5.4, senao o require falha mesmo com o pacote instalado.
+# What config.mk asks pkg-config for: gtk+-3.0, gthread-2.0, webkit2gtk-4.1,
+# sqlite3, javascriptcoregtk-4.1 and luajit (or lua5.1). At run time the
+# interpreter has to find lfs and socket, and those must be built for the 5.1
+# ABI, not 5.4, or require fails even with the package installed.
 
 case "$FAMILY" in
 debian)
@@ -71,33 +71,33 @@ arch)
 esac
 
 if [ "$CHECK_ONLY" -eq 0 ]; then
-    say "Atualizando indice de pacotes"
+    say "Refreshing the package index"
     $REFRESH
-    say "Instalando"
+    say "Installing"
     # shellcheck disable=SC2086
     $INSTALL $PACKAGES
 fi
 
-# --- verificacao -------------------------------------------------------------
+# --- check -------------------------------------------------------------
 
 missing=0
 
-say "Pacotes pkg-config"
+say "pkg-config packages"
 if ! command -v pkg-config >/dev/null 2>&1; then
-    echo "  FALTA   pkg-config"
+    echo "  MISSING pkg-config"
     missing=1
 else
     for pkg in gtk+-3.0 gthread-2.0 webkit2gtk-4.1 sqlite3 javascriptcoregtk-4.1; do
         if pkg-config --exists "$pkg"; then
             printf '  ok      %-24s %s\n' "$pkg" "$(pkg-config --modversion "$pkg")"
         else
-            printf '  FALTA   %s\n' "$pkg"
+            printf '  MISSING %s\n' "$pkg"
             missing=1
         fi
     done
 fi
 
-say "Interpretador Lua"
+say "Lua interpreter"
 LUA_BIN=
 for cand in luajit luajit51 lua5.1 lua-5.1 lua51; do
     if command -v "$cand" >/dev/null 2>&1 && "$cand" -v 2>&1 | grep -Eq '^Lua 5\.1|^LuaJIT'; then
@@ -108,35 +108,35 @@ done
 if [ -n "$LUA_BIN" ]; then
     printf '  ok      %-24s %s\n' "$LUA_BIN" "$($LUA_BIN -v 2>&1 | head -1)"
 else
-    echo "  FALTA   luajit ou lua5.1 (config.mk nao aceita 5.2+)"
+    echo "  MISSING luajit or lua5.1 (config.mk does not take 5.2+)"
     missing=1
 fi
 
-say "Modulos Lua"
+say "Lua modules"
 if [ -n "$LUA_BIN" ]; then
     for mod in lfs socket; do
         if "$LUA_BIN" -e "require('$mod')" >/dev/null 2>&1; then
             printf '  ok      %s\n' "$mod"
         else
-            printf '  FALTA   %-8s (lfs e obrigatorio; socket move o gopher)\n' "$mod"
+            printf '  MISSING %-8s (lfs is required; socket drives gopher)\n' "$mod"
             missing=1
         fi
     done
 else
-    echo "  (pulado -- sem interpretador)"
+    echo "  (skipped, no interpreter)"
 fi
 
 if [ "$missing" -ne 0 ]; then
-    say "Incompleto. Resolva os itens marcados FALTA."
+    say "Incomplete. Deal with the items marked MISSING."
     [ "$FAMILY" = fedora ] && cat <<'EOF'
 
-  No Fedora, lua-filesystem e lua-socket sao compilados para Lua 5.4,
-  e luassert nao e empacotado.
-  O LuaJIT nao os enxerga. Saidas possiveis:
+  On Fedora, lua-filesystem and lua-socket are built for Lua 5.4, and
+  luassert is not packaged at all. LuaJIT cannot see any of them.
+  Two ways out:
     - luarocks --lua-version=5.1 install luafilesystem luasocket luassert
-    - ou construir contra lua5.1 em vez de luajit:  make USE_LUAJIT=0
+    - or build against lua5.1 instead of luajit:  make USE_LUAJIT=0
 EOF
     exit 1
 fi
 
-say "Ambiente pronto.  Proximo:  make -j\$(nproc)"
+say "Environment ready.  Next:  make -j\$(nproc)"

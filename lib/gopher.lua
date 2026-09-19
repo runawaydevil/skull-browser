@@ -77,8 +77,8 @@ _M.parse_gopher_line = function(line, url)
     end
     ret.display_string = fields[1] or ""
     ret.selector = fields[2] or ""
-    -- Campos vem crus do servidor remoto. A porta ja era filtrada; o host
-    -- nao era, e entrava direto num atributo href.
+    -- The fields come raw from the remote server. The port was already
+    -- filtered; the host was not, and it went straight into an href.
     ret.host = (fields[3] or url.host):gsub("[^%w%.%-]", "")
     if ret.host == "" then ret.host = url.host end
     ret.port = (fields[4] or tostring(url.port)):gsub("[^0-9]", "")
@@ -470,8 +470,8 @@ end
 
 -- forward request to error_page module
 local function show_error_page(v, request, reason)
-    -- error_page expande {palavra} ate nao sobrar nenhuma, entao chave crua
-    -- vinda de erro de socket seria engolida como placeholder.
+    -- error_page expands {word} until none are left, so a brace coming out
+    -- of a socket error would be swallowed as a placeholder.
     reason = lousy.util.escape(tostring(reason))
         :gsub("{", "&#123;"):gsub("}", "&#125;")
     pcall(error_page.show_error_page, v, {

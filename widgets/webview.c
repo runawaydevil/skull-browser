@@ -1296,8 +1296,8 @@ luakit_uri_scheme_request_cb(WebKitURISchemeRequest *request, const gchar *schem
 
     WebKitWebView *view = webkit_uri_scheme_request_get_web_view(request);
     if (!view) {
-        /* Sem web view (worker, inspector) nao ha handler possivel. Falhar
-         * explicitamente, senao o carregamento fica pendurado. */
+        /* With no web view (a worker, the inspector) there is no handler to
+         * call. Fail loudly, or the load hangs. */
         GError *e = g_error_new(G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                 "no web view to serve scheme '%s'", scheme);
         webkit_uri_scheme_request_finish_error(request, e);

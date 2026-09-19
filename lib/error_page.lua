@@ -15,9 +15,10 @@ local history = require("history")
 
 local _M = {}
 
--- Valores vindos de fora -- URI, mensagem do WebKit, erro de socket -- nao
--- podem chegar crus ao template: as chaves sao lidas como placeholder e o
--- resto vira markup vivo. Local de proposito: nao e API publica.
+-- Values from outside, meaning the uri, a WebKit message or a socket error,
+-- cannot reach the template raw: braces in them are read as placeholders and
+-- the rest becomes live markup.
+--
 -- Fields that legitimately hold HTML. Everything else reaching the template is
 -- treated as data.
 local markup_fields = { content = true, style = true, buttons = true }
@@ -345,10 +346,10 @@ local function load_error_page(v, error_page_info)
         error_page_info.msg = "<p>" .. table.concat(msg, "</p><p>") .. "</p>"
     end
 
-    -- Substituicao repetida porque um valor pode conter placeholder de outro
-    -- ({content} traz {uri} e {msg}). O limite existe porque gsub com tabela
-    -- conta a ocorrencia mesmo quando a chave nao existe e nada e substituido:
-    -- sem o teto, um unico {palavra} desconhecido trava aqui para sempre.
+    -- Substitution repeats because one value can carry another's placeholder
+    -- ({content} brings {uri} and {msg} with it). The cap is there because
+    -- gsub with a table counts an occurrence even when the key is missing and
+    -- nothing is replaced: without it, one unknown {word} spins here forever.
     local html = _M.html_template
     for _ = 1, 8 do
         local nsub

@@ -65,6 +65,11 @@ Make sure `$HOME/.local/bin` is on your `PATH` if you go that route.
     skull gopher://gopher.floodgap.com
     skull -k        # check config and exit
 
+Under WSL, calling it from Windows needs a login shell, otherwise `~/.local/bin`
+is not on `PATH` and the name does not resolve:
+
+    wsl -d Ubuntu -- bash -lc 'skull gopher://gopher.floodgap.com'
+
 Press `gA` or type `:about` for version information.
 
 

@@ -16,6 +16,12 @@
  *
  */
 
+/* struct ucred is behind _GNU_SOURCE on glibc, and it has to be
+ * defined before the first libc header is pulled in. */
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #include "globalconf.h"
 #include "ipc.h"
 
@@ -24,6 +30,8 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/un.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <errno.h>
@@ -88,26 +96,82 @@ ipc_recv_page_created(ipc_endpoint_t *ipc, const ipc_page_created_t *msg, guint 
     webview_set_web_process_id(w, msg->pid);
 }
 
+/* Anything that connects to the IPC socket can claim to be a web process
+ * and hand over a page id of its choosing, which rebinds the endpoint of a
+ * real tab to its own socket. So the socket lives in a directory only this
+ * user can enter, rather than in the shared temporary directory. */
+static gchar *
+build_socket_dir(void)
+{
+    /* Not "skull": with no XDG_RUNTIME_DIR, glib hands back the cache
+     * directory, and the browser already keeps its cache in skull/ there. */
+    gchar *dir = g_build_filename(g_get_user_runtime_dir(), "skull-ipc", NULL);
+
+    if (g_mkdir_with_parents(dir, 0700) == -1)
+        fatal("Cannot create IPC directory %s: %s", dir, strerror(errno));
+
+    /* g_mkdir_with_parents leaves an existing directory as it found it, so
+     * one planted beforehand would keep whatever mode it was given. */
+    GStatBuf st;
+    if (g_stat(dir, &st) == -1)
+        fatal("Cannot stat IPC directory %s: %s", dir, strerror(errno));
+    if (!S_ISDIR(st.st_mode))
+        fatal("IPC path %s is not a directory", dir);
+    if (st.st_uid != getuid())
+        fatal("IPC directory %s belongs to uid %u, not %u", dir,
+                (unsigned)st.st_uid, (unsigned)getuid());
+    if (st.st_mode & (S_IRWXG | S_IRWXO))
+        fatal("IPC directory %s is reachable by other users", dir);
+
+    return dir;
+}
+
 static gchar *
 build_socket_path(void)
 {
+    gchar *dir = build_socket_dir();
+    gchar *socket_path = NULL;
     char suffix[11] = {0};
-retry:
-    for (unsigned i=0; i < sizeof(suffix)-1; i++) {
-        int c = g_random_int_range(0, 10+26+26), base = '0';
-        if (c >= 10) { base = 'A'; c -= 10; }
-        if (c >= 26) { base = 'a'; c -= 26; }
-        suffix[i] = base + c;
-    }
-    gchar *socket_name = g_strdup_printf("luakit-ipc-%d-%s", getpid(), suffix);
-    gchar *socket_path = g_build_filename(g_get_tmp_dir(), socket_name, NULL);
-    g_free(socket_name);
 
-    if (g_file_test(socket_path, G_FILE_TEST_EXISTS)) {
+    while (TRUE) {
+        for (unsigned i=0; i < sizeof(suffix)-1; i++) {
+            int c = g_random_int_range(0, 10+26+26), base = '0';
+            if (c >= 10) { base = 'A'; c -= 10; }
+            if (c >= 26) { base = 'a'; c -= 26; }
+            suffix[i] = base + c;
+        }
+        gchar *socket_name = g_strdup_printf("ipc-%d-%s", getpid(), suffix);
+        socket_path = g_build_filename(dir, socket_name, NULL);
+        g_free(socket_name);
+
+        if (!g_file_test(socket_path, G_FILE_TEST_EXISTS))
+            break;
         g_free(socket_path);
-        goto retry;
     }
+
+    g_free(dir);
     return socket_path;
+}
+
+/* The web process is a child of this one, so a peer running as anybody else
+ * has no business here. */
+static gboolean
+peer_is_current_user(int sock)
+{
+#if defined(SO_PEERCRED)
+    struct ucred cred;
+    socklen_t len = sizeof(cred);
+
+    if (getsockopt(sock, SOL_SOCKET, SO_PEERCRED, &cred, &len) == -1) {
+        warn("Cannot read peer credentials: %s", strerror(errno));
+        return FALSE;
+    }
+    return cred.uid == getuid();
+#else
+    /* No way to ask; the 0700 directory is the only barrier left. */
+    (void) sock;
+    return TRUE;
+#endif
 }
 
 static gpointer
@@ -136,6 +200,11 @@ web_extension_connect_thread(gpointer UNUSED(data))
     if (bind(sock, (struct sockaddr *)&local, len) == -1)
         fatal("Error calling bind() on socket %s: %s", path, strerror(errno));
 
+    /* Nothing can connect before listen(), so there is no window here in
+     * which the socket sits reachable with the default mode. */
+    if (chmod(local.sun_path, S_IRUSR | S_IWUSR) == -1)
+        fatal("Error calling chmod() on socket %s: %s", path, strerror(errno));
+
     if (listen(sock, 5) == -1)
         fatal("Error calling listen() on socket %s: %s", path, strerror(errno));
 
@@ -152,6 +221,12 @@ web_extension_connect_thread(gpointer UNUSED(data))
         socklen_t size = sizeof(remote);
         if ((web_socket = accept(sock, (struct sockaddr *)&remote, &size)) == -1)
             fatal("Error calling accept(): %s", strerror(errno));
+
+        if (!peer_is_current_user(web_socket)) {
+            warn("Refused IPC connection from another user");
+            close(web_socket);
+            continue;
+        }
 
         ipc_endpoint_t *ipc = ipc_endpoint_new("UI");
         ipc_endpoint_connect_to_socket(ipc, web_socket);

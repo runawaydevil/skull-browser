@@ -50,9 +50,9 @@ static void
 init_directories(void)
 {
     /* create luakit directory */
-    globalconf.cache_dir  = g_build_filename(g_get_user_cache_dir(),  "luakit", globalconf.profile, NULL);
-    globalconf.config_dir = g_build_filename(g_get_user_config_dir(), "luakit", globalconf.profile, NULL);
-    globalconf.data_dir   = g_build_filename(g_get_user_data_dir(),   "luakit", globalconf.profile, NULL);
+    globalconf.cache_dir  = g_build_filename(g_get_user_cache_dir(),  "skull-browser", globalconf.profile, NULL);
+    globalconf.config_dir = g_build_filename(g_get_user_config_dir(), "skull-browser", globalconf.profile, NULL);
+    globalconf.data_dir   = g_build_filename(g_get_user_data_dir(),   "skull-browser", globalconf.profile, NULL);
     g_mkdir_with_parents(globalconf.cache_dir,  0700);
     g_mkdir_with_parents(globalconf.config_dir, 0700);
     g_mkdir_with_parents(globalconf.data_dir,   0700);
@@ -129,7 +129,7 @@ parseopts(int *argc, gchar *argv[], gboolean **nonblock)
 
     /* print version and exit */
     if (version_only) {
-        g_printf("luakit %s\n", VERSION);
+        g_printf("Skull Browser %s\n", VERSION);
         g_printf("  built with: webkit %i.%i.%i ", WEBKIT_MAJOR_VERSION, WEBKIT_MINOR_VERSION, WEBKIT_MICRO_VERSION);
         g_printf("(installed version: %u.%u.%u)\n", webkit_get_major_version(), webkit_get_minor_version(), webkit_get_micro_version());
         g_printf("                 GTK %i.%i.%i \n", GTK_MAJOR_VERSION, GTK_MINOR_VERSION, GTK_MICRO_VERSION);

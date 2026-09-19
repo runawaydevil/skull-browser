@@ -1293,8 +1293,15 @@ luakit_uri_scheme_request_cb(WebKitURISchemeRequest *request, const gchar *schem
     const gchar *uri = webkit_uri_scheme_request_get_uri(request);
 
     WebKitWebView *view = webkit_uri_scheme_request_get_web_view(request);
-    if (!view)
+    if (!view) {
+        /* Sem web view (worker, inspector) nao ha handler possivel. Falhar
+         * explicitamente, senao o carregamento fica pendurado. */
+        GError *e = g_error_new(G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                "no web view to serve scheme '%s'", scheme);
+        webkit_uri_scheme_request_finish_error(request, e);
+        g_error_free(e);
         return;
+    }
     widget_t *w = GOBJECT_TO_LUAKIT_WIDGET(view);
 
     lua_State *L = common.L;

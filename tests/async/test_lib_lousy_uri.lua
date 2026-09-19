@@ -93,9 +93,9 @@ T.test_lousy_uri_parse = function ()
         fragment = "",
         port = 888,
     }
-    local props_uri = "luakit://baz@random-domain.com:888/?a=b&foo=bar"
+    local props_uri = "skull://baz@random-domain.com:888/?a=b&foo=bar"
     assert.is_equal(tostring(parsed + props), props_uri)
-    props_uri = "luakit://baz@random-domain.com:888/"
+    props_uri = "skull://baz@random-domain.com:888/"
     assert.is_equal(tostring(parsed + props + {query = ""}), props_uri)
 end
 

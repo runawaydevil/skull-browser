@@ -1,6 +1,6 @@
---- Provides luakit://help/ page.
+--- Provides skull://help/ page.
 --
--- This module provides the <luakit://help/> page and all of its sub-pages,
+-- This module provides the <skull://help/> page and all of its sub-pages,
 -- including the built-in documentation browser.
 --
 -- @module help_chrome
@@ -57,17 +57,17 @@ local index_html_template = [==[
         <h3>Settings</h3>
         <p>The available settings are displayed at:</p>
         <ul>
-            <li><a href="luakit://settings/">Settings</a></li>
+            <li><a href="skull://settings/">Settings</a></li>
         </ul>
         <h3>Key bindings</h3>
         <p>Currently active bindings are listed in the following page.</p>
         <ul>
-            <li><a href="luakit://binds/">Bindings</a></li>
+            <li><a href="skull://binds/">Bindings</a></li>
         </ul>
         {chromepageshtml}
         <h2>API Documentation</h2>
         <ul>
-            <li><a href="luakit://help/doc/index.html">API Index</a></li>
+            <li><a href="skull://help/doc/index.html">API Index</a></li>
         </ul>
         <h2>Questions, Bugs, and Contributions</h2>
 
@@ -103,11 +103,11 @@ local index_html_template = [==[
 local gen_html_chrome_pages = function()
     local links = ""
     for _, v in ipairs(chrome.available_handlers()) do
-        links = links .. "<li><a href=\"luakit://" .. v .. "\">" .. v .. "</a></li>\n"
+        links = links .. "<li><a href=\"skull://" .. v .. "\">" .. v .. "</a></li>\n"
     end
     return [==[
-        <h3>luakit:// pages</h3>
-        <p>These are all the available <code>luakit://</code> pages:</p>
+        <h3>skull:// pages</h3>
+        <p>These are all the available <code>skull://</code> pages:</p>
         <ul>
 ]==] .. links .. "</ul>"
 end
@@ -314,7 +314,7 @@ local help_doc_page = function (v, path, request)
             content = "Opening <code>" .. file .. "</code> failed",
             buttons = { path ~= "index.html" and {
                 label = "Return to API Index",
-                callback = function (vv) vv.uri = "luakit://help/doc/index.html" end
+                callback = function (vv) vv.uri = "skull://help/doc/index.html" end
             } or nil },
             request = request,
         })
@@ -337,13 +337,13 @@ chrome.add("help", function (v, meta)
 end, nil, {})
 
 add_cmds({
-    { ":help", "Open <luakit://help/> in a new tab.",
-        function (w) w:new_tab("luakit://help/") end },
+    { ":help", "Open <skull://help/> in a new tab.",
+        function (w) w:new_tab("skull://help/") end },
 })
 
 -- Prevent history items from turning up in history
 history.add_signal("add", function (uri)
-    if string.match(uri, "^luakit://help/") then return false end
+    if string.match(uri, "^skull://help/") then return false end
 end)
 
 return _M

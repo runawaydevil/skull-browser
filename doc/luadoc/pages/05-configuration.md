@@ -38,7 +38,7 @@ in luakit's data directory.
 ### Where should I put {userstyles, filterlists, ...}?
 
 1. First, browse to the built-in documentation page for that module. A list of all
-modules is available at the index page at <luakit://help/doc/index.html>.
+modules is available at the index page at <skull://help/doc/index.html>.
 1. Next, check under the **Files and Directories** heading for module-specific
    directions.
 

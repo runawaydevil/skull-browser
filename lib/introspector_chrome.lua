@@ -1,9 +1,9 @@
---- Provided luakit://introspector/ page.
+--- Provided skull://introspector/ page.
 --
 -- **DEPRECTATION NOTICE**
 -- This module has been moved to binds_chrome.lua and should not be used.
 --
--- This module provides the luakit://introspector/ page. It is useful for
+-- This module provides the skull://introspector/ page. It is useful for
 -- viewing all keybindings and modes on a single page, as well as searching for
 -- a keybinding for a particular task.
 --

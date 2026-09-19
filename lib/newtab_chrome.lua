@@ -1,13 +1,13 @@
 --- New tab page for luakit.
 --
--- This module provides <luakit://newtab/>, the luakit new
+-- This module provides <skull://newtab/>, the luakit new
 -- tab page. This page is opened by default when opening a new tab without
 -- specifying a URL to open.
 --
 -- # Customization
 --
 -- The easiest way to customize what is shown at
--- <luakit://newtab/> is to create a HTML file at the
+-- <skull://newtab/> is to create a HTML file at the
 -- path specified by `newtab_chrome.new_tab_file`. By default, this is the
 -- `newtab.html` file located in the luakit data directory.
 --
@@ -65,14 +65,14 @@ luakit.idle_add(function ()
     if not undoclose then return end
     undoclose.add_signal("save", function (view)
         local uri, hist = view.uri or "", view.history
-        if uri:match("^luakit://newtab/?") and #hist.items == 1 then
+        if uri:match("^skull://newtab/?") and #hist.items == 1 then
             return false
         end
     end)
 end)
 
 require "window"
-settings.override_setting("window.new_tab_page", "luakit://newtab/")
+settings.override_setting("window.new_tab_page", "skull://newtab/")
 
 return _M
 

@@ -3,7 +3,7 @@
 -- This module provides browsing history support. Pages are saved to an on-disk
 -- database automatically as the user browses.
 --
--- The <luakit://history/> page is provided by the `history_chrome` module.
+-- The <skull://history/> page is provided by the `history_chrome` module.
 --
 -- @module history
 -- @copyright 2010-2011 Mason Larobina <mason.larobina@gmail.com>
@@ -84,8 +84,8 @@ function _M.add(uri, title, update_visits)
 
     -- Ignore blank uris
     if not uri or uri == "" or uri == "about:blank" then return end
-    -- Ignore luakit:// urls
-    if string.find(uri, "^luakit://") then return end
+    -- Ignore skull:// urls
+    if string.find(uri, "^skull://") then return end
     -- Ask user if we should ignore uri
     if _M.emit_signal("add", uri, title) == false then return end
 

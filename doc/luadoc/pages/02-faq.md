@@ -172,7 +172,7 @@ Probably the easiest way is with the `:set ` command:
 
 This sets the zoom level to 150% by default, and 200% on
 <https://example.com>. You can also change the zoom level at the
-<luakit://settings/> page. Finally, if you prefer to specify the zoom
+<skull://settings/> page. Finally, if you prefer to specify the zoom
 level in your configuration file, you may also do so:
 
     local settings = require "settings"

@@ -1,7 +1,7 @@
---- Add custom luakit:// scheme rendering functions.
+--- Add custom skull:// scheme rendering functions.
 --
 -- This module provides a convenient interface for other modules to add
--- `luakit://` chrome pages, with features like a shared theme, error reporting,
+-- `skull://` chrome pages, with features like a shared theme, error reporting,
 -- and Lua to JavaScript function bridge management.
 --
 -- @module chrome
@@ -166,13 +166,13 @@ _M.stylesheet = [===[
     }
 ]===]
 
--- luakit:// page handlers
+-- skull:// page handlers
 local handlers = {}
 local on_first_visual_handlers = {}
 local page_funcs = {}
 
---- Retrieve a list of the currently registered luakit:// handlers.
--- @treturn {string} A list of `luakit://` handler names, in alphabetical order.
+--- Retrieve a list of the currently registered skull:// handlers.
+-- @treturn {string} A list of `skull://` handler names, in alphabetical order.
 function _M.available_handlers()
     return lousy.util.table.keys(handlers)
 end
@@ -223,13 +223,13 @@ function _M.remove(page)
     on_first_visual_handlers[page] = nil
 end
 
-luakit.register_scheme("luakit")
+luakit.register_scheme("skull")
 
--- Catch all navigations to the luakit:// scheme
+-- Catch all navigations to the skull:// scheme
 webview.add_signal("init", function (view)
-    view:add_signal("scheme-request::luakit", function (v, uri, request)
-        -- Match "luakit://page/path"
-        local page, path = string.match(uri, "^luakit://([^/]+)/?(.*)")
+    view:add_signal("scheme-request::skull", function (v, uri, request)
+        -- Match "skull://page/path"
+        local page, path = string.match(uri, "^skull://([^/]+)/?(.*)")
         if not page then return end
 
         local func = handlers[page]
@@ -237,7 +237,7 @@ webview.add_signal("init", function (view)
             -- Give the handler function everything it may need
             local w = webview.window(v)
             local meta = { page = page, path = path, w = w,
-                uri = "luakit://" .. page .. "/" .. path,
+                uri = "skull://" .. page .. "/" .. path,
                 request = request }
 
             -- Render error output in webview with traceback
@@ -246,7 +246,7 @@ webview.add_signal("init", function (view)
                     heading = "Chrome handler error",
                     content = [==[
                         <div class="errorMessage">
-                            <p>An error occurred in the <code>luakit://{page}/</code> handler function:
+                            <p>An error occurred in the <code>skull://{page}/</code> handler function:
                             <pre>{traceback}</pre>
                         </div>
                     ]==],
@@ -257,7 +257,7 @@ webview.add_signal("init", function (view)
                 })
             end
 
-            -- Call luakit:// page handler
+            -- Call skull:// page handler
             local ok, html, mime = xpcall(function () return func(v, meta) end,
                 error_handler)
             if ok and not request.finished then request:finish(html, mime) end
@@ -269,7 +269,7 @@ webview.add_signal("init", function (view)
             heading = "Chrome handler error",
             content = [==[
                 <div class="errorMessage">
-                    <p>No chrome handler for <code>luakit://{page}/</code></p>
+                    <p>No chrome handler for <code>skull://{page}/</code></p>
                 </div>
             ]==],
             buttons = {},
@@ -282,8 +282,8 @@ webview.add_signal("init", function (view)
         -- Wait for new page to be created
         if status ~= "finished" then return end
 
-        -- Match "luakit://page/path"
-        local page, path = string.match(v.uri, "^luakit://([^/]+)/?(.*)")
+        -- Match "skull://page/path"
+        local page, path = string.match(v.uri, "^skull://([^/]+)/?(.*)")
         if not page then return end
 
         -- Ensure we have a hook to call
@@ -292,15 +292,15 @@ webview.add_signal("init", function (view)
 
         local w = webview.window(v)
         local meta = { page = page, path = path, w = w,
-            uri = "luakit://" .. page .. "/" .. path }
+            uri = "skull://" .. page .. "/" .. path }
 
         -- Call the supplied handler
         on_first_visual_func(v, meta)
     end)
-    -- Always enable JavaScript on luakit:// pages; without this, chrome
+    -- Always enable JavaScript on skull:// pages; without this, chrome
     -- pages which depend upon javascript will break
     view:add_signal("enable-scripts", function (v)
-        if v.uri:match("^luakit://") then return true end
+        if v.uri:match("^skull://") then return true end
     end)
 end)
 

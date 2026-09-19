@@ -1,4 +1,4 @@
--- Add custom luakit:// scheme rendering functions.
+-- Add custom skull:// scheme rendering functions.
 -- @submodule chrome
 -- @copyright 2017 Aidan Holm <aidanholm@gmail.com>
 
@@ -16,7 +16,7 @@ ui:add_signal("function-return", function (_, _, id, ok, ret)
 end)
 
 ui:add_signal("register-function", function (_, _, page_name, func_name)
-    local pattern = "^luakit://" .. page_name .. "/?(.*)"
+    local pattern = "^skull://" .. page_name .. "/?(.*)"
     luakit.register_function(pattern, func_name, function (page, resolve, reject, ...)
         pending[next_id] = { resolve = resolve, reject = reject }
         ui:emit_signal("function-call", page.id, page_name, func_name, next_id, {...})

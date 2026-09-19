@@ -1,7 +1,7 @@
 --- Simple sqlite3 bookmarks - chrome page.
 --
 -- This module allows you to add and remove bookmarks with a simple graphical
--- webpage at <luakit://bookmarks/>. You can currently:
+-- webpage at <skull://bookmarks/>. You can currently:
 --
 --  - add, edit, and remove individual bookmarks,
 --  - tag bookmarks or add markdown descriptions, and
@@ -527,7 +527,7 @@ end, nil, export_funcs)
 --- URI of the bookmarks chrome page.
 -- @type string
 -- @readonly
-_M.chrome_page = "luakit://bookmarks/"
+_M.chrome_page = "skull://bookmarks/"
 
 add_binds("normal", {
     { "B", "Add a bookmark for the current URL.",

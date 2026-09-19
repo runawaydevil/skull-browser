@@ -46,7 +46,7 @@ local window = require "window"
 -- ("$XDG_CONFIG_HOME/luakit/webview.lua" or "/etc/xdg/luakit/webview.lua")
 local webview = require "webview"
 
--- Add luakit://log/ chrome page
+-- Add skull://log/ chrome page
 local log_chrome = require "log_chrome"
 
 window.add_signal("build", function (w)
@@ -111,7 +111,7 @@ local tabmenu = require "tabmenu"
 --local tabgroups = require "tabgroups"
 
 -- Add gopher protocol support (this module needs luasocket)
--- local gopher = require "gopher"
+local gopher = require "gopher"
 
 -- Add greasemonkey-like javascript userscript support
 local userscripts = require "userscripts"

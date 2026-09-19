@@ -1,6 +1,6 @@
 --- Save history in sqlite3 database - chrome page.
 --
--- This module provides the luakit://history/ chrome page - a user interface for
+-- This module provides the skull://history/ chrome page - a user interface for
 -- searching the web browsing history.
 --
 -- @module history_chrome
@@ -407,14 +407,14 @@ end, nil, export_funcs)
 
 -- Prevent history items from turning up in history
 history.add_signal("add", function (uri)
-    if string.match(uri, "^luakit://history/") then return false end
+    if string.match(uri, "^skull://history/") then return false end
 end)
 
 add_cmds({
-    { ":history", "Open <luakit://history/> in a new tab.",
+    { ":history", "Open <skull://history/> in a new tab.",
         function (w, o)
             initial_search_term = o.arg
-            w:new_tab("luakit://history/")
+            w:new_tab("skull://history/")
         end },
 })
 

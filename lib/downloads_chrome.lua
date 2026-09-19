@@ -1,7 +1,7 @@
 --- Downloads for luakit - chrome page.
 --
 -- This module allows you to monitor the progress of ongoing downloads through a
--- webpage at <luakit://downloads/>.
+-- webpage at <skull://downloads/>.
 --
 -- @module downloads_chrome
 -- @copyright 2010-2012 Mason Larobina <mason.larobina@gmail.com>
@@ -270,7 +270,7 @@ downloads.add_signal("status-tick", function (running)
     -- Update all download pages when a change occurrs
     for _, w in pairs(window.bywidget) do
         for _, v in ipairs(w.tabs.children) do
-            if string.match(v.uri or "", "^luakit://downloads/?") then
+            if string.match(v.uri or "", "^skull://downloads/?") then
                 v:eval_js(update_list_js, { no_return = true })
             end
         end
@@ -289,18 +289,18 @@ end, nil, export_funcs)
 --- URI of the downloads chrome page.
 -- @type string
 -- @readonly
-_M.chrome_page = "luakit://downloads/"
+_M.chrome_page = "skull://downloads/"
 
 add_binds("normal", {
-    { "gd", [[Open <luakit://downloads> in current tab.]],
+    { "gd", [[Open <skull://downloads> in current tab.]],
         function (w) w:navigate(_M.chrome_page) end },
 
-    { "gD", [[Open <luakit://downloads> in new tab.]],
+    { "gD", [[Open <skull://downloads> in new tab.]],
         function (w) w:new_tab(_M.chrome_page) end },
 })
 
 add_cmds({
-    { ":downloads", [[Open <luakit://downloads> in new tab.]],
+    { ":downloads", [[Open <skull://downloads> in new tab.]],
         function (w) w:new_tab(_M.chrome_page) end },
 })
 

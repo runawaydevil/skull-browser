@@ -1,6 +1,6 @@
 --- Luakit settings viewer.
 --
--- This module supplies the <luakit://settings/> chrome page, which shows all
+-- This module supplies the <skull://settings/> chrome page, which shows all
 -- settings and their values, and allows adjusting setting values.
 --
 -- @module settings_chrome
@@ -332,8 +332,8 @@ end, nil, {
 })
 
 modes.add_cmds({
-    { ":settings", "Open <luakit://settings/> in a new tab.", function (w)
-        w:new_tab("luakit://settings/")
+    { ":settings", "Open <skull://settings/> in a new tab.", function (w)
+        w:new_tab("skull://settings/")
     end },
 })
 

@@ -337,7 +337,7 @@ add_cmds({
     { ":down[load]", "Download a webpage by URI, defaulting to the current page.", {
         func = function (w, o)
             local uri = o.arg or w.view.uri
-            if uri and not uri:match("^luakit://")
+            if uri and not uri:match("^skull://")
                 then _M.add(uri, { window = w.win })
             elseif uri then
                 w:error("cannot download URI '"..uri.."'")

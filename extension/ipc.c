@@ -168,7 +168,7 @@ web_extension_connect(const gchar *socket_path)
 
     int len = offsetof(struct sockaddr_un, sun_path) + strlen(remote.sun_path);
 
-    debug("luakit web process: connecting to %s", socket_path);
+    debug("web process: connecting to %s", socket_path);
 
     if ((sock = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
         perror("socket");
@@ -180,7 +180,7 @@ web_extension_connect(const gchar *socket_path)
         goto fail_connect;
     }
 
-    debug("luakit web process: connected");
+    debug("web process: connected");
 
     ipc_endpoint_connect_to_socket(extension.ipc, sock);
 

@@ -24,3 +24,8 @@ buildopts.h
 tags
 cscope.*
 
+
+# artefatos de build
+/skull-browser
+/skull-browser.so
+/skull-browser.1

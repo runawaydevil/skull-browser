@@ -1,6 +1,6 @@
 --- Luakit log viewer.
 --
--- This module supplies the <luakit://log/> chrome page, which displays the most
+-- This module supplies the <skull://log/> chrome page, which displays the most
 -- recent log messages.
 --
 -- @module log_chrome
@@ -169,7 +169,7 @@ append_timer:add_signal("timeout", function ()
 
     local views = {}
     for v, _ in pairs(log_views) do
-        if string.match(v.uri or "", "^luakit://log/?") then
+        if string.match(v.uri or "", "^skull://log/?") then
             if not v.is_loading then views[#views+1] = v end
         else
             log_views[v] = nil
@@ -244,7 +244,7 @@ local function widget_click_cb(notif)
         n:hide()
     end
     local w = window.ancestor(notif)
-    if w then w:new_tab("luakit://log/", { switch = true }) end
+    if w then w:new_tab("skull://log/", { switch = true }) end
 end
 
 msg.add_signal("log", function (time, level, group, msg)
@@ -293,8 +293,8 @@ _M.widget = function ()
 end
 
 modes.add_cmds({
-    { ":log", "Open <luakit://log/> in a new tab.", function (w)
-        w:new_tab("luakit://log/")
+    { ":log", "Open <skull://log/> in a new tab.", function (w)
+        w:new_tab("skull://log/")
     end },
 })
 

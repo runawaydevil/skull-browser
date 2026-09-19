@@ -1,7 +1,7 @@
 --- Simple URI-based content filter - chrome page.
 --
 -- This module allows you to configure the `adblock` module with a simple
--- graphical webpage at <luakit://adblock/>. You can
+-- graphical webpage at <skull://adblock/>. You can
 -- currently:
 --
 --  - enable/disable the adblocker globally, and
@@ -156,7 +156,7 @@ _M.html_style = [===[
 local function refresh_views()
     for _, w in pairs(window.bywidget) do
         for _, v in ipairs(w.tabs.children) do
-            if string.match(v.uri or "", "^luakit://adblock/?") then
+            if string.match(v.uri or "", "^skull://adblock/?") then
                 v:reload()
             end
         end
@@ -168,7 +168,7 @@ adblock.refresh_views = refresh_views
 --- URI of the adblock chrome page.
 -- @type string
 -- @readwrite
-_M.chrome_page = "luakit://adblock/"
+_M.chrome_page = "skull://adblock/"
 
 -- Shows the chrome page in the given view.
 chrome.add("adblock", function ()
@@ -306,9 +306,9 @@ end)
 
 -- Add chrome binds.
 add_binds("normal", {
-    { "ga", "Open <luakit://adblock/> in the current tab.",
+    { "ga", "Open <skull://adblock/> in the current tab.",
         function (w) w:navigate(_M.chrome_page) end },
-    { "gA", "Open <luakit://adblock/> in a new tab.",
+    { "gA", "Open <skull://adblock/> in a new tab.",
         function (w, m)
             for _=1, m.count do
                 w:new_tab(_M.chrome_page)
@@ -318,7 +318,7 @@ add_binds("normal", {
 
 -- Add chrome commands.
 add_cmds({
-    { ":adblock", "Open <luakit://adblock/> in a new tab.",
+    { ":adblock", "Open <skull://adblock/> in a new tab.",
         function (w) w:new_tab(_M.chrome_page) end },
 })
 

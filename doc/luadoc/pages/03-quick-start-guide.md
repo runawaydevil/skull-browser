@@ -75,7 +75,7 @@ There are several different keys to scroll a webview:
 ## Configuration
 
 It is possible to configure most of the global Luakit settings in the
-<a href="luakit://settings">luakit://settings</a> page. For further
+<a href="skull://settings">skull://settings</a> page. For further
 adjustments (per-domain settings, adjusting/defining bindings or commands) you
 should create a custom configuration file.
 
@@ -114,7 +114,7 @@ the @ref{modes/remap_binds} method. For example:
     })
 
 You can also check all the currently available key bindings in the
-<a href="luakit://binds">luakit://binds</a> page, for each of luakit's modes,
+<a href="skull://binds">skull://binds</a> page, for each of luakit's modes,
 along with their documentation and links to the exact location where they
 were defined.
 

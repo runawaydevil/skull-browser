@@ -26,7 +26,7 @@ web_module:add_signal("form-active", function (_, page_id)
 end)
 
 web_module:add_signal("navigate", function (_, page_id, uri)
-    msg.verbose("Got luakit:// -> file:// navigation: %s", uri)
+    msg.verbose("Got skull:// -> file:// navigation: %s", uri)
     for _, w in pairs(window.bywidget) do
         if w.view.id == page_id then w.view.uri = uri end
     end

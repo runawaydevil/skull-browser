@@ -197,7 +197,7 @@ starting luakit:
 
 If you have a HiDPI monitor (> 1920x1080) and find that web pages are
 too small, you can change the `webview.zoom_level` on the settings page
-(luakit://settings/) to 150 or 200 as per your taste.
+(skull://settings/) to 150 or 200 as per your taste.
 
 
 ## Reporting Bugs

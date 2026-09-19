@@ -151,7 +151,7 @@ local function stylesheet()
 
     return [[
         <style>
-            body, pre, input, { font-family: monospace; }
+            body, pre, input { font-family: monospace; }
             body {
                 background-color: ]] .. bg .. [[;
                 color: ]] .. fg .. [[;
@@ -454,6 +454,10 @@ end
 
 -- forward request to error_page module
 local function show_error_page(v, request, reason)
+    -- error_page expande {palavra} ate nao sobrar nenhuma, entao chave crua
+    -- vinda de erro de socket seria engolida como placeholder.
+    reason = lousy.util.escape(tostring(reason))
+        :gsub("{", "&#123;"):gsub("}", "&#125;")
     pcall(error_page.show_error_page, v, {
         heading = "Gopher Site Loading Failed",
         content = reason,
@@ -473,7 +477,11 @@ end
 
 webview.add_signal("init", function (view)
     view:add_signal("scheme-request::gopher", function (v, uri, request)
-        local url = assert(parse_url(uri))
+        local ok, url = pcall(parse_url, uri)
+        if not ok or not url then
+            show_error_page(v, request, "Malformed gopher URI: " .. tostring(uri))
+            return
+        end
         local message = table.concat({url.selector, url.search}, "\t")
         local net = coroutine.create(function ()
             return net_request(url.host, url.port, message .. "\r\n")

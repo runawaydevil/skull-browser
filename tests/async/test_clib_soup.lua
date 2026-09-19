@@ -24,18 +24,18 @@ T.test_soup = function ()
         path = "/",
         port = 900,
     })
-    assert.are.same(soup.parse_uri("luakit://page"), {
+    assert.are.same(soup.parse_uri("skull://page"), {
         scheme = "luakit",
         host = "page",
     })
-    assert.are.same(soup.parse_uri("luakit://page/foo"), {
+    assert.are.same(soup.parse_uri("skull://page/foo"), {
         scheme = "luakit",
         host = "page",
         path = "/foo",
     })
-    assert.are.same(soup.parse_uri("view-source:luakit://page/foo"), {
+    assert.are.same(soup.parse_uri("view-source:skull://page/foo"), {
         scheme = "view-source",
-        path = "luakit://page/foo",
+        path = "skull://page/foo",
     })
 end
 

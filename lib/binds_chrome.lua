@@ -1,6 +1,6 @@
---- Provides luakit://binds/ page.
+--- Provides skull://binds/ page.
 --
--- This module provides the luakit://binds/ page. It is useful for viewing all
+-- This module provides the skull://binds/ page. It is useful for viewing all
 -- bindings and modes on a single page, as well as searching for a
 -- binding for a particular task.
 --
@@ -318,13 +318,13 @@ end, nil, {
 })
 
 add_cmds({
-    { ":binds", "Open <luakit://binds/> in a new tab.",
-        function (w) w:new_tab("luakit://binds/") end },
+    { ":binds", "Open <skull://binds/> in a new tab.",
+        function (w) w:new_tab("skull://binds/") end },
 })
 
 -- Prevent history items from turning up in history
 history.add_signal("add", function (uri)
-    if string.match(uri, "^luakit://binds/") then return false end
+    if string.match(uri, "^skull://binds/") then return false end
 end)
 
 return _M

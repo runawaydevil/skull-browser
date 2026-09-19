@@ -137,7 +137,7 @@
 -- mime-type, connect to the signal and return a string with the content to
 -- display.
 --
--- This interface is used to register the `luakit://` scheme, but is not limited
+-- This interface is used to register the `skull://` scheme, but is not limited
 -- to this prefix alone.
 --
 -- # Example

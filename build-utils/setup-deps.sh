@@ -46,21 +46,21 @@ fi
 case "$FAMILY" in
 debian)
     PACKAGES="build-essential pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev
-              libsqlite3-dev luajit libluajit-5.1-dev lua-filesystem lua-socket
+              libsqlite3-dev luajit libluajit-5.1-dev lua-filesystem lua-socket lua-luassert
               libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good"
     INSTALL="sudo apt-get install -y"
     REFRESH="sudo apt-get update"
     ;;
 fedora)
     PACKAGES="gcc make pkgconf-pkg-config gtk3-devel webkit2gtk4.1-devel
-              sqlite-devel luajit luajit-devel lua-filesystem lua-socket
+              sqlite-devel luajit luajit-devel lua-filesystem lua-socket lua-luassert
               gstreamer1-devel gstreamer1-plugins-base-devel"
     INSTALL="sudo dnf install -y"
     REFRESH="sudo dnf makecache"
     ;;
 arch)
     PACKAGES="base-devel pkgconf gtk3 webkit2gtk-4.1 sqlite luajit
-              lua51-filesystem lua51-socket gstreamer gst-plugins-base gst-plugins-good"
+              lua51-filesystem lua51-socket lua51-luassert gstreamer gst-plugins-base gst-plugins-good"
     INSTALL="sudo pacman -S --needed --noconfirm"
     REFRESH="sudo pacman -Sy"
     ;;

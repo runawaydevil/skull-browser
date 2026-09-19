@@ -284,11 +284,16 @@ _M.get_setting_for_view = function (view, key)
     local tree, uri = S.view_overrides[view], view.uri
     if tree and tree[key] then return tree[key] end
     -- domain-specific values
+    -- A view that has not loaded anything yet has no uri, and
+    -- domains_from_uri raises on nil. No domain rule can match in that case,
+    -- so the empty list falls straight through to the global default below.
     if uri ~= uri_domain_cache.uri then
         uri_domain_cache.uri = uri
-        uri_domain_cache.domains = lousy.uri.domains_from_uri(uri)
+        uri_domain_cache.domains = uri and lousy.uri.domains_from_uri(uri) or {}
     end
-    local domains = uri_domain_cache.domains
+    -- The cache also starts out holding nil for a nil uri, which the check
+    -- above cannot tell from a hit.
+    local domains = uri_domain_cache.domains or {}
     for _, domain in ipairs(domains) do
         local value = (S.domain[domain] or {})[key]
         if value ~= nil then return value, domain end

@@ -37,6 +37,24 @@ T.test_settings = function ()
     assert.equal(settings.on[".com"].foo.bar, nil)
 end
 
+T.test_webview_settings_apply_before_any_load = function ()
+    -- Settings used to be pushed onto the widget when the load committed, so
+    -- a brand new view ran on WebKit's own defaults until its first page was
+    -- already on the way in.
+    -- webview.new is the constructor that runs the init hooks; a raw
+    -- widget{type="webview"} skips them.
+    local webview = require "webview"
+    local was = settings.webview.enable_javascript
+
+    settings.webview.enable_javascript = false
+    assert.is_false(webview.new({}).enable_javascript)
+
+    settings.webview.enable_javascript = true
+    assert.is_true(webview.new({}).enable_javascript)
+
+    settings.webview.enable_javascript = was
+end
+
 return T
 
 -- vim: et:sw=4:ts=8:sts=4:tw=80

@@ -752,13 +752,19 @@ _M.add_signal("init", function (view)
             set(vv, k, v, match)
         end
     end
-    -- Set domain-specific values on page load
+    -- Global defaults go on straight away. Everything used to wait for the
+    -- load to commit, which left a new view running on WebKit's own defaults
+    -- until its first page was already on the way in.
+    set_all(view)
+
+    -- Domain-specific values land at "provisional", when the target uri is
+    -- known and the response has not been parsed yet. Waiting for "committed"
+    -- made a per-domain enable_javascript = false a race against the parser.
     view:add_signal("load-status", function (v, status)
         if v.uri == "about:blank" then
             return
         elseif status == "provisional" or status == "redirected" then
-            local val, match = settings.get_setting_for_view(v, "webview.user_agent")
-            set(v, "webview.user_agent", val, match)
+            set_all(v)
         elseif status == "committed" then set_all(v) end
     end)
     view:add_signal("web-extension-loaded", function (v)

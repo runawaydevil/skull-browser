@@ -260,8 +260,8 @@ local init_funcs = {
     end,
 
     set_window_icon = function (w)
-        local path = (luakit.dev_paths and os.exists("./extras/skull-browser.png")) or
-            os.exists(luakit.install_paths.pixmap_dir .. "/skull-browser.png")
+        local path = (luakit.dev_paths and os.exists("./extras/skull.png")) or
+            os.exists(luakit.install_paths.pixmap_dir .. "/skull.png")
         if path then w.win.icon = path end
     end,
 

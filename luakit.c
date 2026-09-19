@@ -50,9 +50,9 @@ static void
 init_directories(void)
 {
     /* create luakit directory */
-    globalconf.cache_dir  = g_build_filename(g_get_user_cache_dir(),  "skull-browser", globalconf.profile, NULL);
-    globalconf.config_dir = g_build_filename(g_get_user_config_dir(), "skull-browser", globalconf.profile, NULL);
-    globalconf.data_dir   = g_build_filename(g_get_user_data_dir(),   "skull-browser", globalconf.profile, NULL);
+    globalconf.cache_dir  = g_build_filename(g_get_user_cache_dir(),  "skull", globalconf.profile, NULL);
+    globalconf.config_dir = g_build_filename(g_get_user_config_dir(), "skull", globalconf.profile, NULL);
+    globalconf.data_dir   = g_build_filename(g_get_user_data_dir(),   "skull", globalconf.profile, NULL);
     g_mkdir_with_parents(globalconf.cache_dir,  0700);
     g_mkdir_with_parents(globalconf.config_dir, 0700);
     g_mkdir_with_parents(globalconf.data_dir,   0700);

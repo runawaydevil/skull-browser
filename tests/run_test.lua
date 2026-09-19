@@ -149,7 +149,7 @@ local function spawn_luakit_instance(config, ...)
         cmd = cmd .. k .."=" .. v .. " "
     end
 
-    cmd = cmd .. "./skull-browser -U --log=error -c " .. config .. " " .. table.concat({...}, " ")  .. " 2>&1"
+    cmd = cmd .. "./skull -U --log=error -c " .. config .. " " .. table.concat({...}, " ")  .. " 2>&1"
     return assert(io.popen(cmd))
 end
 

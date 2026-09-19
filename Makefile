@@ -17,7 +17,7 @@ EXT_OBJS = $(foreach obj,$(EXT_SRCS:.c=.o),$(obj))
 # Must be kept in sync with doc/docgen.ld
 DOC_SRCS = $(filter-out lib/markdown.lua lib/lousy/init.lua,$(shell for d in doc/luadoc lib common/clib; do find $$d -type f; done)) tests/lib.lua
 
-all: options newline skull-browser skull-browser.1 skull-browser.so apidoc
+all: options newline skull skull.1 skull.so apidoc
 
 options:
 	@echo luakit build options:
@@ -44,15 +44,22 @@ options:
 $(THEAD) $(TSRC): $(TLIST)
 	$(LUA_BIN_NAME) ./build-utils/gentokens.lua $(TLIST) $@
 
-buildopts.h: buildopts.h.in
-	sed -e 's#LUAKIT_INSTALL_PATH .*#LUAKIT_INSTALL_PATH "$(PREFIX)/share/skull-browser"#' \
+# FORCE porque PREFIX e XDGPREFIX podem vir da linha de comando: sem isso o
+# header guarda os caminhos da primeira build e o binario procura os modulos
+# no lugar errado. Regera sempre, mas so substitui se o conteudo mudou, para
+# nao recompilar a arvore inteira a toa.
+buildopts.h: buildopts.h.in FORCE
+	@sed -e 's#LUAKIT_INSTALL_PATH .*#LUAKIT_INSTALL_PATH "$(PREFIX)/share/skull"#' \
 		-e 's#LUAKIT_CONFIG_PATH .*#LUAKIT_CONFIG_PATH "$(XDGPREFIX)"#' \
 		-e 's#LUAKIT_DOC_PATH .*#LUAKIT_DOC_PATH "$(DOCDIR)"#' \
 		-e 's#LUAKIT_MAN_PATH .*#LUAKIT_MAN_PATH "$(MANPREFIX)"#' \
 		-e 's#LUAKIT_PIXMAP_PATH .*#LUAKIT_PIXMAP_PATH "$(PIXMAPDIR)"#' \
 		-e 's#LUAKIT_APP_PATH .*#LUAKIT_APP_PATH "$(APPDIR)"#' \
 		-e 's#LUAKIT_LIB_PATH .*#LUAKIT_LIB_PATH "$(LIBDIR)"#' \
-		buildopts.h.in > buildopts.h
+		buildopts.h.in > buildopts.h.tmp
+	@if cmp -s buildopts.h.tmp buildopts.h; then rm -f buildopts.h.tmp; else mv buildopts.h.tmp buildopts.h; fi
+
+FORCE:
 
 $(filter-out $(EXT_OBJS),$(OBJS)) $(EXT_OBJS): $(HEADS) config.mk
 
@@ -66,15 +73,15 @@ $(EXT_OBJS) : %.o : %.c
 
 widgets/webview.o: $(wildcard widgets/webview/*.c)
 
-skull-browser: $(OBJS)
+skull: $(OBJS)
 	@echo $(CC) -o $@ $(OBJS)
 	@$(CC) -o $@ $(OBJS) $(LDFLAGS)
 
-skull-browser.so: $(EXT_OBJS)
+skull.so: $(EXT_OBJS)
 	@echo $(CC) -o $@ $(EXT_OBJS)
 	@$(CC) -o $@ $(EXT_OBJS) -shared $(LDFLAGS)
 
-skull-browser.1: skull-browser.1.in
+skull.1: skull.1.in
 	@sed "s|LUAKITVERSION|$(VERSION)|" $< > $@
 
 doc/apidocs/index.html: $(DOC_SRCS) $(wildcard build-utils/docgen/*)
@@ -88,7 +95,7 @@ doc: buildopts.h $(THEAD) $(TSRC)
 	doxygen -s doc/luakit.doxygen
 
 clean:
-	rm -rf doc/apidocs doc/html skull-browser $(OBJS) $(EXT_OBJS) $(TSRC) $(THEAD) buildopts.h skull-browser.1 skull-browser.so
+	rm -rf doc/apidocs doc/html skull $(OBJS) $(EXT_OBJS) $(TSRC) $(THEAD) buildopts.h skull.1 skull.so
 
 install: all
 	install -d $(DESTDIR)$(DOCDIR)/classes
@@ -99,36 +106,36 @@ install: all
 	install -m644 doc/apidocs/modules/* $(DESTDIR)$(DOCDIR)/modules
 	install -m644 doc/apidocs/pages/* $(DESTDIR)$(DOCDIR)/pages
 	install -m644 doc/apidocs/*.html $(DESTDIR)$(DOCDIR)
-	install -d $(DESTDIR)$(PREFIX)/share/skull-browser/lib/lousy/widget
-	install -m644 lib/*.* $(DESTDIR)$(PREFIX)/share/skull-browser/lib
-	install -m644 lib/lousy/*.* $(DESTDIR)$(PREFIX)/share/skull-browser/lib/lousy
-	install -m644 lib/lousy/widget/*.* $(DESTDIR)$(PREFIX)/share/skull-browser/lib/lousy/widget
+	install -d $(DESTDIR)$(PREFIX)/share/skull/lib/lousy/widget
+	install -m644 lib/*.* $(DESTDIR)$(PREFIX)/share/skull/lib
+	install -m644 lib/lousy/*.* $(DESTDIR)$(PREFIX)/share/skull/lib/lousy
+	install -m644 lib/lousy/widget/*.* $(DESTDIR)$(PREFIX)/share/skull/lib/lousy/widget
 	install -d $(DESTDIR)$(LIBDIR)
-	install -m644 skull-browser.so $(DESTDIR)$(LIBDIR)/skull-browser.so
+	install -m644 skull.so $(DESTDIR)$(LIBDIR)/skull.so
 	install -d $(DESTDIR)$(PREFIX)/bin
-	install skull-browser $(DESTDIR)$(PREFIX)/bin/skull-browser
-	install -d $(DESTDIR)$(XDGPREFIX)/skull-browser/
-	install -m644 config/*.lua $(DESTDIR)$(XDGPREFIX)/skull-browser/
+	install skull $(DESTDIR)$(PREFIX)/bin/skull
+	install -d $(DESTDIR)$(XDGPREFIX)/skull/
+	install -m644 config/*.lua $(DESTDIR)$(XDGPREFIX)/skull/
 	install -d $(DESTDIR)$(PIXMAPDIR)
-	install -m644 extras/skull-browser.png $(DESTDIR)$(PIXMAPDIR)
-	install -m644 extras/skull-browser.svg $(DESTDIR)$(PIXMAPDIR)
+	install -m644 extras/skull.png $(DESTDIR)$(PIXMAPDIR)
+	install -m644 extras/skull.svg $(DESTDIR)$(PIXMAPDIR)
 	install -d $(DESTDIR)$(APPDIR)
-	install -m644 extras/skull-browser.desktop $(DESTDIR)$(APPDIR)
+	install -m644 extras/skull.desktop $(DESTDIR)$(APPDIR)
 	install -d $(DESTDIR)$(MANPREFIX)/man1/
-	install -m644 skull-browser.1 $(DESTDIR)$(MANPREFIX)/man1/
-	install -d $(DESTDIR)$(PREFIX)/share/skull-browser/resources/icons
-	for i in resources/icons/*; do install -m644 "$$i" "$(DESTDIR)$(PREFIX)/share/skull-browser/resources/icons"; done
+	install -m644 skull.1 $(DESTDIR)$(MANPREFIX)/man1/
+	install -d $(DESTDIR)$(PREFIX)/share/skull/resources/icons
+	for i in resources/icons/*; do install -m644 "$$i" "$(DESTDIR)$(PREFIX)/share/skull/resources/icons"; done
 
 uninstall:
-	rm -rf $(DESTDIR)$(PREFIX)/bin/skull-browser $(DESTDIR)$(PREFIX)/share/skull-browser $(DESTDIR)$(PREFIX)/lib/luakit
-	rm -rf $(DESTDIR)$(MANPREFIX)/man1/skull-browser.1 $(DESTDIR)$(XDGPREFIX)/skull-browser
-	rm -rf $(DESTDIR)$(APPDIR)/skull-browser.desktop $(DESTDIR)$(PIXMAPDIR)/skull-browser.png
+	rm -rf $(DESTDIR)$(PREFIX)/bin/skull $(DESTDIR)$(PREFIX)/share/skull $(DESTDIR)$(PREFIX)/lib/luakit
+	rm -rf $(DESTDIR)$(MANPREFIX)/man1/skull.1 $(DESTDIR)$(XDGPREFIX)/skull
+	rm -rf $(DESTDIR)$(APPDIR)/skull.desktop $(DESTDIR)$(PIXMAPDIR)/skull.png
 
 tests/util.so: tests/util.c Makefile
 	$(CC) -fPIC $(CFLAGS) $(CPPFLAGS) -shared $< $(LDFLAGS) -o $@
 
-run-tests: skull-browser skull-browser.so tests/util.so
+run-tests: skull skull.so tests/util.so
 	@$(LUA_BIN_NAME) tests/run_test.lua
 
 newline: options;@echo
-.PHONY: all clean options install newline apidoc doc default
+.PHONY: all clean options install newline apidoc doc default FORCE

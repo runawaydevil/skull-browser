@@ -5,7 +5,7 @@
 
 local system_paths, luakit_paths = {}, {}
 for path in string.gmatch(package.path, "[^;]+") do
-    if not path:match("^%./") and not path:find("skull%-browser") then
+    if not path:match("^%./") and not path:find("skull") then
         table.insert(system_paths, path)
     elseif not path:match("^%./") and path:find("luakit_test_") then
         table.insert(luakit_paths, path)

@@ -10,8 +10,8 @@
 // Saida:
 //   resources/icons/tab-icon-<nome>.png      16x16
 //   resources/icons/tab-icon-<nome>@2x.png   32x32
-//   extras/skull-browser.png                 64x64  (icone do aplicativo)
-//   extras/skull-browser.svg                 vetor do icone do aplicativo
+//   extras/skull.png                 64x64  (icone do aplicativo)
+//   extras/skull.svg                 vetor do icone do aplicativo
 
 'use strict';
 
@@ -286,8 +286,8 @@ for (const { name, grid, color } of ICONS) {
 console.log('icone do aplicativo:');
 {
     const { size, px } = renderGrid(SKULL, 'g', 3, 8, 'd');
-    write('extras/skull-browser.png', encodePng(size, size, px));
-    write('extras/skull-browser.svg', Buffer.from(buildAppSvg(), 'utf8'));
+    write('extras/skull.png', encodePng(size, size, px));
+    write('extras/skull.svg', Buffer.from(buildAppSvg(), 'utf8'));
 }
 
 console.log('\npronto.');

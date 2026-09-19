@@ -214,7 +214,7 @@ luaH_parserc(const gchar *confpath, gboolean run)
     /* search system config dirs (see: XDG_CONFIG_DIRS) */
     config_dirs = g_get_system_config_dirs();
     for(; *config_dirs; config_dirs++)
-        g_ptr_array_add(paths, g_build_filename(*config_dirs, "skull-browser", "rc.lua", NULL));
+        g_ptr_array_add(paths, g_build_filename(*config_dirs, "skull", "rc.lua", NULL));
 
     /* get continuation variable; bail out if invalid */
     char *i_str = getenv("LUAKIT_NEXT_CONFIG_INDEX");

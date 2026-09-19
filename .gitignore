@@ -26,6 +26,6 @@ cscope.*
 
 
 # artefatos de build
-/skull-browser
-/skull-browser.so
-/skull-browser.1
+/skull
+/skull.so
+/skull.1

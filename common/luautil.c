@@ -171,7 +171,7 @@ luaH_add_paths(lua_State *L, const gchar *config_dir)
     /* add system config dirs (see: XDG_CONFIG_DIRS) */
     const gchar* const *config_dirs = g_get_system_config_dirs();
     for (; *config_dirs; config_dirs++)
-        g_ptr_array_add(paths, g_build_filename(*config_dirs, "skull-browser", NULL));
+        g_ptr_array_add(paths, g_build_filename(*config_dirs, "skull", NULL));
 
     const gchar *path;
     for (guint i = 0; i < paths->len; i++) {

@@ -61,20 +61,25 @@ Make sure `$HOME/.local/bin` is on your `PATH` if you go that route.
 
 ## Run
 
-    skull-browser
-    skull-browser gopher://gopher.floodgap.com
-    skull-browser -k        # check config and exit
+    skull
+    skull gopher://gopher.floodgap.com
+    skull -k        # check config and exit
 
 Press `gA` or type `:about` for version information.
 
 
 ## Configuration
 
-User config lives in `~/.config/skull-browser/`. Copy the shipped `rc.lua` there
-and edit it:
+User config lives in `~/.config/skull/`. Copy the shipped `rc.lua` there and
+edit it:
 
-    mkdir -p ~/.config/skull-browser
-    cp /usr/local/etc/xdg/skull-browser/rc.lua ~/.config/skull-browser/
+    mkdir -p ~/.config/skull
+    cp config/rc.lua config/theme.lua ~/.config/skull/
+
+A system install also drops a copy in `/usr/local/etc/xdg/skull/`, which is
+picked up automatically when there is nothing in `~/.config/skull/`. A home
+install (`PREFIX=$HOME/.local`) puts it somewhere the browser does not search,
+so copy it by hand as shown above.
 
 Themes are a flat Lua table in `theme.lua` with a cascading naming scheme:
 `tab_selected_fg` falls back to `selected_fg`, then to `fg`. Change a handful

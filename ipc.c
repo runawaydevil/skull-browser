@@ -166,7 +166,7 @@ initialize_web_extensions_cb(WebKitWebContext *context, gpointer UNUSED(data))
     char *dirs[] = { g_get_current_dir(), LUAKIT_LIB_PATH }, *dir = NULL;
 
     for (unsigned i = 0; !dir && i < LENGTH(dirs); ++i) {
-        char *extension_file = g_build_filename(dirs[i],  "skull-browser.so", NULL);
+        char *extension_file = g_build_filename(dirs[i],  "skull.so", NULL);
         verbose("checking for luakit extension at '%s'", dirs[i]);
         if (!access(extension_file, R_OK))
             dir = dirs[i];

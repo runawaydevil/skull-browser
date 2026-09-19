@@ -94,14 +94,14 @@ _M.html_style = [===[
     th:nth-child(3), td:nth-child(3) { min-width: 250px; }
     th:nth-child(4), td:nth-child(4) { width: 100%; }
 
-    tr:hover > td { background: #f8f8f8; }
-    tr > td { background: linear-gradient(180deg, #fafafa 0%, #fff 100%); }
+    tr:hover > td { background: var(--bg-raised); }
+    tr > td { background: linear-gradient(180deg, var(--bg-raised) 0%, var(--bg-raised) 100%); }
 
-    tr.level-verbose { color: #666; }
-    tr.level-warn > td { background: #FFB964; }
-    tr.level-warn:hover > td { background: #F9B561; }
-    tr.level-error > td { background: #D87050; }
-    tr.level-error:hover > td { background: #CF6A4C; }
+    tr.level-verbose { color: var(--fg-dim); }
+    tr.level-warn > td { background: var(--amber); }
+    tr.level-warn:hover > td { background: var(--amber); }
+    tr.level-error > td { background: var(--blood); }
+    tr.level-error:hover > td { background: var(--blood); }
 
     td.level { }
     td { font-family: monospace; }
@@ -207,14 +207,14 @@ end)
 -- numerical argument, the result of which is substituted into @ref{widget_format}.
 -- @type string
 -- @readwrite
-_M.widget_error_format = "<span color='#f00'>E: %d</span>"
+_M.widget_error_format = "<span color='#e05260'>E: %d</span>"
 
 --- Format string which defines the appearance of the error/warning widget.
 -- This is passed to `string.format` with the number of warnings as a
 -- numerical argument, the result of which is substituted into @ref{widget_format}.
 -- @type string
 -- @readwrite
-_M.widget_warning_format = "<span color='#f60'>W: %d</span>"
+_M.widget_warning_format = "<span color='#e8b23a'>W: %d</span>"
 
 --- Format string which defines the appearance of the error/warning widget.
 -- This combines the error and warning sub-format strings. `{errors}` will be

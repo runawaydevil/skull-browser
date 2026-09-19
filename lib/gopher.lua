@@ -6,8 +6,7 @@
 -- @author Ygrex <ygrex@ygrex.ru>
 
 local lousy = require("lousy")
-local settings = require("settings")
-local theme = lousy.theme.get()
+local smallweb = require("smallweb")
 
 local socket_loaded, socket = pcall(require, "socket")
 if not socket_loaded then
@@ -149,39 +148,10 @@ local function chop_periods(data)
 end
 
 local function stylesheet()
-    local bg, fg, link;
-    if not (theme.gopher_dark and theme.gopher_light) then
-        msg.warn("Cannot find gopher styles. Please sync your theme.lua. Loading defaults.")
-        bg = "#E8E8E8"; fg = "#17181C"; link = "#03678D"
-    else
-        if settings.get_setting("application.prefer_dark_mode") then
-            bg   = theme.gopher_dark.bg;
-            fg   = theme.gopher_dark.fg;
-            link = theme.gopher_dark.link
-        else
-            bg   = theme.gopher_light.bg;
-            fg   = theme.gopher_light.fg;
-            link = theme.gopher_light.link
-        end
-    end
-
-    return [[
-        <style>
-            body, pre, input { font-family: monospace; }
-            body {
-                background-color: ]] .. bg .. [[;
-                color: ]] .. fg .. [[;
-                max-width: 80ex;
-                margin: 0;
-                padding: 5px;
-            }
-            a, a:active, a:visited {
-                text-decoration: none;
-                color: ]] .. link .. [[;
-            }
-        </style>
-    ]];
-end;
+    -- The look, and the page/terminal choice, live in the shared smallweb
+    -- layer so gopher and gemini stay in step.
+    return smallweb.stylesheet()
+end
 
 local function text_to_html(data, url)
     return [[

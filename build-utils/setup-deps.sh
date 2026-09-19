@@ -46,7 +46,7 @@ fi
 case "$FAMILY" in
 debian)
     PACKAGES="build-essential pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev
-              libsqlite3-dev luajit libluajit-5.1-dev lua-filesystem lua-socket lua-luassert lua-check
+              libsqlite3-dev luajit libluajit-5.1-dev lua-filesystem lua-socket lua-sec lua-luassert lua-check
               libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good
               gstreamer1.0-plugins-bad gstreamer1.0-libav xvfb"
     INSTALL="sudo apt-get install -y"
@@ -54,7 +54,7 @@ debian)
     ;;
 fedora)
     PACKAGES="gcc make pkgconf-pkg-config gtk3-devel webkit2gtk4.1-devel
-              sqlite-devel luajit luajit-devel lua-filesystem lua-socket
+              sqlite-devel luajit luajit-devel lua-filesystem lua-socket lua-sec
               gstreamer1-devel gstreamer1-plugins-base-devel
               gstreamer1-plugins-bad-free xorg-x11-server-Xvfb"
     INSTALL="sudo dnf install -y"
@@ -62,7 +62,7 @@ fedora)
     ;;
 arch)
     PACKAGES="base-devel pkgconf gtk3 webkit2gtk-4.1 sqlite luajit
-              lua51-filesystem lua51-socket lua51-luassert luacheck
+              lua51-filesystem lua51-socket lua51-sec lua51-luassert luacheck
               gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-libav
               xorg-server-xvfb"
     INSTALL="sudo pacman -S --needed --noconfirm"
@@ -114,11 +114,11 @@ fi
 
 say "Lua modules"
 if [ -n "$LUA_BIN" ]; then
-    for mod in lfs socket; do
+    for mod in lfs socket ssl; do
         if "$LUA_BIN" -e "require('$mod')" >/dev/null 2>&1; then
             printf '  ok      %s\n' "$mod"
         else
-            printf '  MISSING %-8s (lfs is required; socket drives gopher)\n' "$mod"
+            printf '  MISSING %-8s (lfs is required; socket+ssl drive gopher and gemini)\n' "$mod"
             missing=1
         fi
     done

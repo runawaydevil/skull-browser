@@ -46,11 +46,11 @@ _M.stylesheet = [===[
 .item .time {
     -webkit-user-select: none;
     cursor: default;
-    color: #888;
+    color: var(--fg-faint);
     display: inline-block;
     width: 5em;
     text-align: right;
-    border-right: 1px solid #ddd;
+    border-right: 1px solid var(--line);
     padding-right: 0.5em;
     margin-right: 0.1em;
 }
@@ -60,15 +60,15 @@ _M.stylesheet = [===[
 }
 
 .item .domain a {
-    color: #aaa;
+    color: var(--fg-faint);
 }
 
 .item .domain a:hover {
-    color: #666;
+    color: var(--fg-dim);
 }
 
 .item.selected {
-    background-color: #eee;
+    background-color: var(--line);
 }
 
 .nav-button-box {
@@ -77,7 +77,7 @@ _M.stylesheet = [===[
 
 .nav-button-box a {
     display: none;
-    border: 1px solid #aaa;
+    border: 1px solid var(--fg-faint);
     padding: 0.4em 1em;
 }
 

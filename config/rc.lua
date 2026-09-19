@@ -114,6 +114,10 @@ local tabmenu = require "tabmenu"
 -- Add gopher protocol support (this module needs luasocket)
 local gopher = require "gopher"
 
+-- Gemini and the shared small web layer (page/terminal render, TOFU)
+local gemini = require "gemini"
+local smallweb_chrome = require "smallweb_chrome"
+
 -- Add greasemonkey-like javascript userscript support
 local userscripts = require "userscripts"
 

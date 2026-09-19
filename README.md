@@ -1,8 +1,9 @@
 # Skull Browser
 
 A keyboard-driven web browser that treats the small web as a first-class
-citizen. Regular sites over `https://`, plus native `gopher://` support.
-Everything above the C core is Lua, and you can change all of it.
+citizen. Regular sites over `https://`, plus native `gopher://` and
+`gemini://` support. Everything above the C core is Lua, and you can change
+all of it.
 
 ![C](https://img.shields.io/badge/C-C11-555555?logo=c&logoColor=white)
 ![Lua](https://img.shields.io/badge/Lua-5.1%20%2F%20LuaJIT-2C2D72?logo=lua&logoColor=white)
@@ -28,7 +29,8 @@ that is Linux.
     WebKitGTK 4.1
     Lua 5.1 or LuaJIT
     lfs        (lua filesystem)
-    socket     (lua socket, for gopher)
+    socket     (lua socket, for gopher and gemini)
+    ssl        (luasec, for gemini TLS)
     sqlite3
     gstreamer  (video playback)
 
@@ -88,7 +90,31 @@ so copy it by hand as shown above.
 
 Themes are a flat Lua table in `theme.lua` with a cascading naming scheme:
 `tab_selected_fg` falls back to `selected_fg`, then to `fg`. Change a handful
-of root keys and the whole interface follows.
+of root keys and the whole interface follows. The internal `skull://` pages
+read their colours from the same file through CSS custom properties, so one
+edit moves the whole browser.
+
+
+## Small web
+
+`gopher://` and `gemini://` are rendered by the browser itself, not proxied.
+Both share one presentation layer, so a setting applies to both.
+
+    skull gopher://gopher.floodgap.com
+    skull gemini://geminiprotocol.net
+
+Two render modes, switched at `skull://smallweb/` or with `gS`:
+
+    terminal   full width, monospaced, a caret on every link (default)
+    page       a comfortable measure, read like a document
+
+Gemini has no certificate authorities. The first time a host is seen its
+certificate is remembered, and a different one later is reported rather than
+accepted. This is trust on first use. `skull://smallweb/` lists the remembered
+hosts and forgets any of them, which trusts the next certificate afresh.
+
+Gemini needs LuaSec (the `ssl` module). Without it the scheme still loads but
+every page explains what to install. `setup-deps.sh` installs it.
 
 
 ## Tests

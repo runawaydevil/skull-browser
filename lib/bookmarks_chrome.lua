@@ -39,7 +39,7 @@ _M.stylesheet = [===[
     padding: 0;
     left: 0;
     right: 0;
-    border: 1px solid #fff;
+    border: 1px solid var(--bg-raised);
     border-radius: 0.3em;
 }
 .bookmark:first-child { margin-top: 1em; }
@@ -69,7 +69,7 @@ _M.stylesheet = [===[
 }
 
 .bookmark .uri {
-    color: #aaa;
+    color: var(--fg-faint);
 }
 
 .bookmark .bottom {
@@ -87,21 +87,21 @@ _M.stylesheet = [===[
 }
 
 .bookmark .tags a {
-    color: #666;
-    background-color: #f6f6f6;
+    color: var(--fg-dim);
+    background-color: var(--bg-sunken);
     padding: 0.1em 0.4em;
     margin: 0 0.3em;
     -webkit-border-radius: 0.2em;
-    -webkit-box-shadow: 0 0.1em 0.1em #666;
+    -webkit-box-shadow: 0 0.1em 0.1em var(--fg-dim);
 }
 
 .bookmark .tags a:hover {
-    color: #111;
+    color: var(--fg);
 }
 
 .bookmark .desc {
-    color: #222;
-    border-left: 0.3em solid #ddd;
+    color: var(--fg);
+    border-left: 0.3em solid var(--line);
     margin: 0 0 0.2em 0.5em;
     padding: 0 0 0 0.5em;
     max-width: 60em;
@@ -121,19 +121,19 @@ _M.stylesheet = [===[
 }
 
 .bookmark .controls a {
-    color: #888;
+    color: var(--fg-faint);
     padding: 0.1em 0.4em;
     margin: 0 0;
 }
 
 .bookmark .controls a:hover {
-    background-color: #fff;
+    background-color: var(--bg-raised);
     -webkit-border-radius: 0.2em;
-    -webkit-box-shadow: 0 0.1em 0.1em #666;
+    -webkit-box-shadow: 0 0.1em 0.1em var(--fg-dim);
 }
 
 .bookmark .date {
-    color: #444;
+    color: var(--fg-dim);
     margin-right: 0.2em;
 }
 
@@ -148,7 +148,7 @@ _M.stylesheet = [===[
     top: 0;
     bottom: 0;
     opacity: 0.5;
-    background-color: #000;
+    background-color: var(--fg);
     z-index: 100;
 }
 
@@ -164,7 +164,7 @@ _M.stylesheet = [===[
     padding: 1em;
     width: 36.6em;
 
-    background-color: #eee;
+    background-color: var(--line);
     border-radius: 0.3em;
     box-shadow: 0 0.5em 2em rgba(0, 0, 0, 0.3);
 }
@@ -185,9 +185,9 @@ _M.stylesheet = [===[
     outline: none;
     margin: 0;
     padding: 0;
-    background-color: #fff;
+    background-color: var(--bg-raised);
     border-radius: 0.25em;
-    box-shadow: 0 0.1em 0.1em #888;
+    box-shadow: 0 0.1em 0.1em var(--fg-faint);
 }
 
 #edit-dialog input[type="text"], #edit-dialog textarea {
@@ -198,7 +198,7 @@ _M.stylesheet = [===[
 #edit-dialog input[type="button"], #edit-dialog input[type="submit"] {
     padding: 0.5em 1em;
     margin-right: 0.5em;
-    color: #444;
+    color: var(--fg-dim);
 }
 
 #edit-dialog textarea {
@@ -215,7 +215,7 @@ _M.stylesheet = [===[
 
 .nav-button-box a {
     display: none;
-    border: 1px solid #aaa;
+    border: 1px solid var(--fg-faint);
     padding: 0.4em 1em;
 }
 ]===]

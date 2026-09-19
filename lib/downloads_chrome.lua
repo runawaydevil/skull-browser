@@ -56,22 +56,22 @@ _M.stylesheet = [==[
         width: 90px;
         position: absolute;
         display: block;
-        color: #888;
+        color: var(--fg-faint);
     }
 
     .download .title a {
-        color: #3F6EC2;
+        color: var(--cyan);
         padding-right: 16px;
     }
 
     .download .status {
         display: inline;
-        color: #999;
+        color: var(--fg-faint);
         white-space: nowrap;
     }
 
     .download .uri a {
-        color: #56D;
+        color: var(--cyan);
         text-overflow: ellipsis;
         display: inline-block;
         white-space: nowrap;
@@ -81,7 +81,7 @@ _M.stylesheet = [==[
     }
 
     .download .controls a {
-        color: #777;
+        color: var(--fg-faint);
         margin-right: 16px;
     }
 ]==]

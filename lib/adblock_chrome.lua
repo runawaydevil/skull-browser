@@ -142,11 +142,11 @@ _M.html_style = [===[
         padding: 1em;
     }
     .state_Enabled {
-        color: #799D6A;
+        color: var(--phos);
         font-weight: bold;
     }
     .state_Disabled {
-        color: #CF6A4C;
+        color: var(--blood);
         font-weight: bold;
     }
 ]===]
@@ -245,7 +245,7 @@ nil,
 -- @readwrite
 _M.navigation_blocked_css_tmpl = [===[
     body {
-        background-color: #ddd;
+        background-color: var(--line);
         margin: 0;
         padding: 0;
         display: flex;
@@ -254,11 +254,11 @@ _M.navigation_blocked_css_tmpl = [===[
     }
 
     #errorContainer {
-        background: #fff;
+        background: var(--bg-raised);
         min-width: 35em;
         max-width: 35em;
         padding: 2.5em;
-        border: 2px solid #aaa;
+        border: 2px solid var(--fg-faint);
         -webkit-border-radius: 5px;
     }
 

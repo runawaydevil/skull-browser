@@ -105,8 +105,8 @@ _M.html_style = [===[
 }
 
 .setting.has-error input {
-    border: 1px solid #f34;
-    background: #fdd;
+    border: 1px solid var(--blood);
+    background: var(--bg-sunken);
 }
 .setting.has-error .tooltip {
     display: block;
@@ -123,15 +123,15 @@ _M.html_style = [===[
     background: white;
 }
 .setting:hover {
-    background: #f6f6f6;
+    background: var(--bg-sunken);
 }
 .setting.disabled {
     background: transparent;
 }
 
 .tooltip {
-    background: #121215;
-    color: #f66;
+    background: var(--bg-sunken);
+    color: var(--blood);
     font-size: 0.8rem;
     line-height: 1;
     padding: 0.6em 0.75rem;
@@ -177,13 +177,13 @@ table.input th {
     font-weight: normal;
     text-align: left;
     padding-bottom: 0.3rem;
-    border-bottom: 1px solid #777;
+    border-bottom: 1px solid var(--fg-faint);
 }
 
 .boolean > input { margin-left: 0; }
 .boolean > span { font-weight: bold; }
-.boolean > span[data-value=true] { color: #799D6A; }
-.boolean > span[data-value=false] { color: #CF6A4C; }
+.boolean > span[data-value=true] { color: var(--phos); }
+.boolean > span[data-value=false] { color: var(--blood); }
 ]===]
 
 local function build_settings_entry_table_html(meta)

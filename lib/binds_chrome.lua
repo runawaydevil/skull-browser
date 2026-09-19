@@ -39,7 +39,7 @@ local html_template = [==[
         header {
             padding: 0.5em 0 0.5em 0;
             margin: 2em 0 0.5em 0;
-            border-bottom: 1px solid #888;
+            border-bottom: 1px solid var(--fg-faint);
         }
 
         h1 {
@@ -53,7 +53,7 @@ local html_template = [==[
             color: black;
             margin-bottom: 1.0em;
             line-height: 1.4em;
-            border-bottom: 1px solid #888;
+            border-bottom: 1px solid var(--fg-faint);
         }
 
         h1, h2, h3, h4 {
@@ -93,7 +93,7 @@ local html_template = [==[
         }
 
         .bind:hover {
-            background-color: #f8f8f8;
+            background-color: var(--bg-raised);
             -webkit-border-radius: 0.5em;
         }
 
@@ -105,19 +105,19 @@ local html_template = [==[
         }
 
         .bind .link-box a {
-            color: #11c;
+            color: var(--cyan);
             text-decoration: none;
         }
 
         .bind .link-box a:hover {
-            color: #11c;
+            color: var(--cyan);
             text-decoration: underline;
         }
 
         .bind .key {
             font-family: monospace, sans-serif;
             float: left;
-            color: #2E4483;
+            color: var(--cyan);
             font-weight: bold;
             font-size: 0.8em;
         }
@@ -136,19 +136,19 @@ local html_template = [==[
         }
 
         .bind code {
-            color: #2525ff;
+            color: var(--cyan);
             display: inline-block;
         }
 
         .bind pre {
             padding: 1rem 1.2rem;
-            border-left: 2px solid #69c;
-            background: #f5f7f9;
-            color: #334;
+            border-left: 2px solid var(--cyan);
+            background: var(--bg-sunken);
+            color: var(--fg-dim);
         }
 
         .bind pre code {
-            color: #000;
+            color: var(--fg);
         }
 
         .mode h4 {
@@ -166,7 +166,7 @@ local html_template = [==[
         }
 
         .bind_type_any .key {
-            color: #888;
+            color: var(--fg-faint);
             float: left;
         }
 

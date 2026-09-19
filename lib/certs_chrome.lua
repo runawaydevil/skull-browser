@@ -27,12 +27,12 @@ _M.stylesheet = [===[
         display: flex;
         align-items: baseline;
         justify-content: space-between;
-        border-bottom: 1px solid #d8d8d8;
+        border-bottom: 1px solid var(--line);
         padding-bottom: 0.6em;
         margin-bottom: 1.4em;
     }
     .header h1 { margin: 0; font-size: 1.4em; }
-    .header .count { color: #888; font-size: 0.9em; }
+    .header .count { color: var(--fg-faint); font-size: 0.9em; }
 
     .note {
         background: #fff8e1;
@@ -47,7 +47,7 @@ _M.stylesheet = [===[
     th {
         text-align: left;
         font-weight: normal;
-        color: #888;
+        color: var(--fg-faint);
         font-size: 0.82em;
         text-transform: uppercase;
         letter-spacing: 0.06em;
@@ -59,7 +59,7 @@ _M.stylesheet = [===[
         vertical-align: baseline;
     }
     td.host { font-family: monospace; font-size: 1em; }
-    td.when { color: #666; white-space: nowrap; }
+    td.when { color: var(--fg-dim); white-space: nowrap; }
     td.act { text-align: right; width: 1%; }
 
     .revoke {
@@ -70,7 +70,7 @@ _M.stylesheet = [===[
     }
     .revoke:hover { border-bottom-color: #b00020; }
 
-    .empty { color: #888; padding: 2em 0; }
+    .empty { color: var(--fg-faint); padding: 2em 0; }
 ]===]
 
 local html_template = [==[

@@ -253,16 +253,16 @@ local help_doc_page = function (v, path, request)
                     font-weight: bold;
                 }
                 .status_indicator.active {
-                    border: 2px solid #008800;
-                    color: #008800;
+                    border: 2px solid var(--phos);
+                    color: var(--phos);
                 }
                 .status_indicator.inactive {
-                    border: 2px solid #880000;
-                    color: #880000;
+                    border: 2px solid var(--blood);
+                    color: var(--blood);
                 }
                 .status_indicator.builtin {
-                    border: 2px solid #444444;
-                    color: #444444;
+                    border: 2px solid var(--fg-dim);
+                    color: var(--fg-dim);
                 }
                 .status_indicator.active::before { content: "✓ "; }
                 .status_indicator.inactive::before { content: "✗ "; }

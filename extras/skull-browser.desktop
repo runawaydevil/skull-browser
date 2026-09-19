@@ -1,8 +1,8 @@
 [Desktop Entry]
-Name=Luakit
-Comment=Fast, small, webkit based micro-browser extensible by Lua
-Exec=luakit %u
-Icon=luakit
+Name=Skull Browser
+Comment=Fast, keyboard-driven webkit browser extensible by Lua
+Exec=skull-browser %u
+Icon=skull-browser
 Terminal=false
 Type=Application
 Categories=Network;WebBrowser;

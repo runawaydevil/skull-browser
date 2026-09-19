@@ -416,7 +416,7 @@ _M.methods = {
 
     update_win_title = function (w)
         local uri, title = w.view.uri, w.view.title
-        title = (title or "luakit") .. ((uri and " - " .. uri) or "")
+        title = (title or "Skull Browser") .. ((uri and " - " .. uri) or "")
         local max = settings.get_setting("window.max_title_len")
         if utf8.len(title) > max then
             local suffix = "..."

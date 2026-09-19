@@ -25,11 +25,11 @@ T.test_soup = function ()
         port = 900,
     })
     assert.are.same(soup.parse_uri("skull://page"), {
-        scheme = "luakit",
+        scheme = "skull",
         host = "page",
     })
     assert.are.same(soup.parse_uri("skull://page/foo"), {
-        scheme = "luakit",
+        scheme = "skull",
         host = "page",
         path = "/foo",
     })

@@ -125,6 +125,14 @@ local function spawn_luakit_instance(config, ...)
         DISPLAY = xvfb_display
     }
 
+    -- env -i limpa tudo, entao repassar os caminhos de modulo Lua quando
+    -- existirem: sem isso nao da para rodar a suite com luassert instalado
+    -- fora do prefixo do sistema.
+    for _, var in ipairs({ "LUA_PATH", "LUA_CPATH", "LD_LIBRARY_PATH" }) do
+        local val = util.getenv(var)
+        if val and val ~= "" then env[var] = "'" .. val .. "'" end
+    end
+
     -- HACK: make GStreamer shut up about not finding random .so files
     -- when it rebuilds its registry, which it does with every single
     -- luakit instance spawned this way
@@ -141,7 +149,7 @@ local function spawn_luakit_instance(config, ...)
         cmd = cmd .. k .."=" .. v .. " "
     end
 
-    cmd = cmd .. "./luakit -U --log=error -c " .. config .. " " .. table.concat({...}, " ")  .. " 2>&1"
+    cmd = cmd .. "./skull-browser -U --log=error -c " .. config .. " " .. table.concat({...}, " ")  .. " 2>&1"
     return assert(io.popen(cmd))
 end
 
@@ -209,6 +217,11 @@ if git~=nil then
     end
 end
 
+-- Reaproveitar um display existente quando pedido. Xvfb exige /tmp/.X11-unix
+-- com dono e modo proprios e um xkbcomp em /usr/bin; nem todo ambiente tem
+-- isso (WSLg, conteineres), e ali um X server ja esta no ar.
+local reuse_display = os.getenv("SKULL_TEST_DISPLAY")
+
 -- Find a free server number
 -- Does have a race condition...
 for i=0,math.huge do
@@ -221,12 +234,17 @@ for i=0,math.huge do
 end
 
 -- Launch Xvfb for lifetime of test runner
-print("Starting Xvfb")
-local pid_xvfb = assert(util.spawn_async({"Xvfb", xvfb_display, "-screen", "0", "800x600x8"}))
-table.insert(exit_handlers, function ()
-    print("Stopping Xvfb")
-    util.kill(pid_xvfb)
-end)
+if reuse_display and reuse_display ~= "" then
+    xvfb_display = reuse_display
+    print("Using display " .. xvfb_display)
+else
+    print("Starting Xvfb")
+    local pid_xvfb = assert(util.spawn_async({"Xvfb", xvfb_display, "-screen", "0", "800x600x8"}))
+    table.insert(exit_handlers, function ()
+        print("Stopping Xvfb")
+        util.kill(pid_xvfb)
+    end)
+end
 
 -- Find test files
 local test_file_pat = "/test_%S+%.lua$"

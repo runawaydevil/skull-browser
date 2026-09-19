@@ -86,7 +86,7 @@ T.test_lousy_uri_parse = function ()
     assert.is_equal(tostring(parsed), uri_without_password)
 
     local props = {
-        scheme = "luakit",
+        scheme = "skull",
         user = "baz",
         host = "random-domain.com",
         path = "/",

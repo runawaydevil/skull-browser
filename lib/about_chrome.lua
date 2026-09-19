@@ -1,4 +1,8 @@
---- Pagina skull://about.
+--- About page for Skull Browser.
+--
+-- This module provides <skull://about/>, which shows the browser name, the
+-- running version and where the project came from. It is reachable with the
+-- `gA` binding or the `:about` command.
 --
 -- @module about_chrome
 -- @copyright 2026 Pablo Murad <pablomurad@pm.me>
@@ -10,6 +14,9 @@ local add_binds, add_cmds = modes.add_binds, modes.add_cmds
 
 local _M = {}
 
+--- CSS applied to the about page.
+-- @type string
+-- @readwrite
 _M.stylesheet = [===[
     body {
         display: flex;

@@ -46,21 +46,23 @@ fi
 case "$FAMILY" in
 debian)
     PACKAGES="build-essential pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev
-              libsqlite3-dev luajit libluajit-5.1-dev lua-filesystem lua-socket lua-luassert
-              libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good"
+              libsqlite3-dev luajit libluajit-5.1-dev lua-filesystem lua-socket lua-luassert lua-check
+              libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good
+              xvfb"
     INSTALL="sudo apt-get install -y"
     REFRESH="sudo apt-get update"
     ;;
 fedora)
     PACKAGES="gcc make pkgconf-pkg-config gtk3-devel webkit2gtk4.1-devel
-              sqlite-devel luajit luajit-devel lua-filesystem lua-socket lua-luassert
-              gstreamer1-devel gstreamer1-plugins-base-devel"
+              sqlite-devel luajit luajit-devel lua-filesystem lua-socket
+              gstreamer1-devel gstreamer1-plugins-base-devel xorg-x11-server-Xvfb"
     INSTALL="sudo dnf install -y"
     REFRESH="sudo dnf makecache"
     ;;
 arch)
     PACKAGES="base-devel pkgconf gtk3 webkit2gtk-4.1 sqlite luajit
-              lua51-filesystem lua51-socket lua51-luassert gstreamer gst-plugins-base gst-plugins-good"
+              lua51-filesystem lua51-socket lua51-luassert luacheck
+              gstreamer gst-plugins-base gst-plugins-good xorg-server-xvfb"
     INSTALL="sudo pacman -S --needed --noconfirm"
     REFRESH="sudo pacman -Sy"
     ;;
@@ -126,9 +128,10 @@ if [ "$missing" -ne 0 ]; then
     say "Incompleto. Resolva os itens marcados FALTA."
     [ "$FAMILY" = fedora ] && cat <<'EOF'
 
-  No Fedora, lua-filesystem e lua-socket sao compilados para Lua 5.4.
+  No Fedora, lua-filesystem e lua-socket sao compilados para Lua 5.4,
+  e luassert nao e empacotado.
   O LuaJIT nao os enxerga. Saidas possiveis:
-    - luarocks --lua-version=5.1 install luafilesystem luasocket
+    - luarocks --lua-version=5.1 install luafilesystem luasocket luassert
     - ou construir contra lua5.1 em vez de luajit:  make USE_LUAJIT=0
 EOF
     exit 1

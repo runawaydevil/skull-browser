@@ -227,7 +227,7 @@ widget_window(lua_State *UNUSED(L), widget_t *w, luakit_token_t UNUSED(token))
     w->widget = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     d->win = GTK_WINDOW(w->widget);
     gtk_window_set_default_size(d->win, 800, 600);
-    gtk_window_set_title(d->win, "Skull Browser");
+    gtk_window_set_title(d->win, "Skull");
     if (globalconf.application)
         gtk_window_set_application(d->win, globalconf.application);
 

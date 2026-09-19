@@ -26,7 +26,6 @@ require "unique_instance"
 
 -- Set the number of web processes to use. A value of 0 means 'no limit'. This
 -- has no effect since WebKit 2.26
-luakit.process_limit = 4
 -- Set the cookie storage location
 soup.cookies_storage = luakit.data_dir .. "/cookies.db"
 
@@ -79,6 +78,8 @@ require "settings_chrome"
 -- Add adblock
 local adblock = require "adblock"
 local adblock_chrome = require "adblock_chrome"
+local adblock_bootstrap = require "adblock_bootstrap"
+adblock_bootstrap.update_when_idle()
 
 local webinspector = require "webinspector"
 

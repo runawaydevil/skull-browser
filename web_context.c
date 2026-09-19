@@ -26,8 +26,6 @@
 
 /** WebKit context common to all web views */
 static WebKitWebContext *web_context;
-/** WebKit process count; default to unlimited */
-static guint process_limit = 0;
 /** Whether the web context startup function has been run */
 static gboolean web_context_started = FALSE;
 
@@ -39,21 +37,6 @@ web_context_get(void)
 {
     g_assert(web_context);
     return web_context;
-}
-
-guint
-web_context_process_limit_get(void)
-{
-    return process_limit;
-}
-
-gboolean
-web_context_process_limit_set(guint limit)
-{
-    if (web_context_started)
-        return FALSE;
-    process_limit = limit;
-    return TRUE;
 }
 
 static void
@@ -104,12 +87,6 @@ web_context_init_finish(void)
 {
     if (web_context_started)
         return;
-
-#if !WEBKIT_CHECK_VERSION(2,26,0)
-    webkit_web_context_set_process_model(web_context, WEBKIT_PROCESS_MODEL_MULTIPLE_SECONDARY_PROCESSES);
-    info("Web process count: %d", process_limit);
-    webkit_web_context_set_web_process_count_limit(web_context, process_limit);
-#endif
 
     web_context_started = TRUE;
 }

@@ -18,47 +18,84 @@ local _M = {}
 -- @type string
 -- @readwrite
 _M.stylesheet = [===[
+    :root {
+        --bg:      #07090c;
+        --phos:    #3df07a;
+        --phos-dim:#1f8f49;
+        --bone:    #e9e5d9;
+        --muted:   #5d6470;
+        --cyan:    #35d6c3;
+    }
+    * { box-sizing: border-box; }
     body {
         display: flex;
         align-items: center;
         justify-content: center;
-        min-height: 78vh;
+        min-height: 92vh;
         margin: 0;
-        background: #0c0d10;
-        color: #e7e3d8;
         font-family: monospace;
+        color: var(--bone);
+        background:
+            radial-gradient(ellipse at 50% 28%, #10281b 0%, transparent 62%),
+            var(--bg);
     }
-    #about {
-        text-align: center;
-        line-height: 1.7;
+    /* Varredura de tubo: sutil, so para o fundo nao ficar morto. */
+    body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background: repeating-linear-gradient(
+            to bottom, rgba(0,0,0,0.22) 0 1px, transparent 1px 3px);
     }
+    #about { text-align: center; line-height: 1.75; }
     #mark {
-        width: 96px;
-        height: 96px;
-        margin: 0 auto 26px;
+        width: 104px;
+        height: 104px;
+        margin: 0 auto 30px;
         image-rendering: pixelated;
+        filter: drop-shadow(0 0 14px rgba(61,240,122,0.45));
     }
     #name {
-        font-size: 30px;
+        font-size: 44px;
         font-weight: 700;
+        letter-spacing: 12px;
+        margin: 0 0 2px;
+        padding-left: 12px;
+        color: var(--phos);
+        text-shadow: 0 0 18px rgba(61,240,122,0.55);
+    }
+    #tagline {
+        font-size: 12px;
         letter-spacing: 3px;
-        margin: 0;
-        color: #3df07a;
+        text-transform: uppercase;
+        color: var(--phos-dim);
+        margin: 0 0 26px;
     }
     #version {
-        font-size: 13px;
-        color: #6f7480;
-        margin: 6px 0 30px;
-    }
-    #author {
-        font-size: 15px;
-        margin: 0 0 30px;
-    }
-    #origin {
         font-size: 12px;
-        color: #6f7480;
-        max-width: 46ex;
+        color: var(--muted);
+        margin: 0 0 32px;
+    }
+    #author { font-size: 15px; margin: 0 0 6px; }
+    #author b { color: var(--phos); font-weight: 700; }
+    #site {
+        display: inline-block;
+        font-size: 13px;
+        color: var(--cyan);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(53,214,195,0.35);
+        padding-bottom: 1px;
+        margin-bottom: 34px;
+    }
+    #site:hover { border-bottom-color: var(--cyan); }
+    #origin {
+        font-size: 11px;
+        color: var(--muted);
+        max-width: 52ex;
         margin: 0 auto;
+        padding-top: 20px;
+        border-top: 1px solid rgba(93,100,112,0.22);
     }
 ]===]
 
@@ -86,15 +123,17 @@ local html_template = [==[
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sobre</title>
+    <title>About</title>
     <style>{stylesheet}</style>
 </head>
 <body>
     <div id="about">
         <div id="mark">{mark}</div>
-        <p id="name">SKULL BROWSER</p>
+        <p id="name">SKULL</p>
+        <p id="tagline">{tagline}</p>
         <p id="version">{version}</p>
-        <p id="author">{author}</p>
+        <p id="author">developed by <b>{author}</b></p>
+        <a id="site" href="{site}">{site}</a>
         <p id="origin">{origin}</p>
     </div>
 </body>
@@ -105,19 +144,21 @@ chrome.add("about", function ()
     local subs = {
         stylesheet = _M.stylesheet,
         mark = mark_svg,
+        tagline = "keyboard-driven browser for the whole web",
         version = lousy.util.escape(luakit.version),
-        author = "Pablo Murad",
-        origin = "Baseado no luakit. Distribuido sob a GNU GPLv3.",
+        author = "pmurad",
+        site = "https://pablomurad.com",
+        origin = "Based on luakit. Distributed under the GNU GPLv3.",
     }
     return (string.gsub(html_template, "{(%w+)}", subs))
 end)
 
 add_binds("normal", {
-    { "^gA$", "Abrir a pagina sobre.", function (w) w:navigate("skull://about/") end },
+    { "^gA$", "Open the about page.", function (w) w:navigate("skull://about/") end },
 })
 
 add_cmds({
-    { ":about", "Abrir a pagina sobre.", function (w) w:navigate("skull://about/") end },
+    { ":about", "Open the about page.", function (w) w:navigate("skull://about/") end },
 })
 
 return _M

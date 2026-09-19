@@ -431,6 +431,13 @@ _M.load = function (reload, single_list, no_sync)
 
     if not no_sync and not single_list then
         adblock_wm:emit_signal("update_rules", _M.rules)
+        -- update_rules troca a tabela de regras mas nao mexe em enabled_rules,
+        -- entao um processo web existente ficava com a lista carregada e
+        -- desligada ate alguem alternar na mao. Reemitir o estado resolve.
+        for name, list in pairs(_M.rules) do
+            adblock_wm:emit_signal("list_set_enabled", name,
+                util.table.hasitem(list.opts or {}, "Enabled") and true or false)
+        end
     end
     _M.refresh_views()
 end

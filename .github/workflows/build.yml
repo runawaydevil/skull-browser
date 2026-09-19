@@ -1,0 +1,25 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # getversion.sh deriva a versao de `git describe --tags`; sem o
+          # historico completo o build reporta versao errada.
+          fetch-depth: 0
+
+      - name: Dependencias
+        run: sh build-utils/setup-deps.sh
+
+      - name: Build
+        run: make -j$(nproc)
+
+      - name: Testes
+        run: make run-tests

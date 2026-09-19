@@ -840,10 +840,13 @@ settings.register_settings({
     },
     ["window.search_engines"] = {
         type = "string:",
-        -- Buscadores independentes por padrao. SearXNG e metabusca que
-        -- qualquer um pode hospedar; Marginalia e Wiby indexam a web pequena
-        -- e textual; Mojeek tem rastreador proprio. Nenhum revende Google.
+        -- Google como padrao, por praticidade. Os independentes ficam como
+        -- atalho: SearXNG e metabusca que qualquer um pode hospedar,
+        -- Marginalia e Wiby indexam a web pequena e textual, Mojeek tem
+        -- rastreador proprio.
         default = {
+            google      = "https://google.com/search?q=%s",
+            ddg         = "https://duckduckgo.com/?q=%s",
             sx          = "https://searx.be/search?q=%s",
             marginalia  = "https://marginalia-search.com/search?query=%s",
             mojeek      = "https://www.mojeek.com/search?q=%s",
@@ -851,7 +854,7 @@ settings.register_settings({
             wikipedia   = "https://en.wikipedia.org/wiki/Special:Search?search=%s",
             github      = "https://github.com/search?q=%s",
 
-            default     = "https://searx.be/search?q=%s",
+            default     = "https://google.com/search?q=%s",
         },
         desc = "The set of search engine shortcuts.",
         formatter = function (t, k)

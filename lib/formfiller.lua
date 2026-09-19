@@ -212,10 +212,26 @@ local function read_formfiller_rules_from_file()
     return state.rules
 end
 
+-- The stored pattern is an escaped full URI with no anchor, so an unanchored
+-- find matches anywhere in the string: a rule for bank.example/login also
+-- matches evil.example/x#bank.example/login. Require the page host to appear
+-- in the pattern, the same precaution autofill already took, so that filling
+-- by hand cannot hand a password to another origin either.
+local function rule_covers_uri (rule, uri)
+    if not string.find(uri, rule.pattern) then return false end
+    local parsed = lousy.uri.parse(uri)
+    if not parsed or not parsed.host then return false end
+    local domain = parsed.host
+    if parsed.port and parsed.port ~= 80 and parsed.port ~= 443 then
+        domain = domain .. ":" .. parsed.port
+    end
+    return rule.pattern:find(lousy.util.lua_escape(domain), 1, true) ~= nil
+end
+
 local function form_specs_for_uri (all_rules, uri)
     -- Filter rules to the given uri
     local rules = lousy.util.table.filter_array(all_rules, function(_, rule)
-        return string.find(uri, rule.pattern)
+        return rule_covers_uri(rule, uri)
     end)
 
     -- Get list of all form specs that can be matched
@@ -250,9 +266,14 @@ end)
 formfiller_wm:add_signal("add", function (_, view_id, str)
     local w = w_from_view_id(view_id)
     w:set_mode()
+    -- This file holds passwords in cleartext. It is created here on first
+    -- use, so tighten it before anything is written; the cookie jar already
+    -- gets the same treatment and credentials deserve no less.
+    local existed = os.exists(file)
     local f = io.open(file, "a")
     f:write(str)
     f:close()
+    if not existed then os.execute(string.format("chmod 600 %q", file)) end
     edit()
 end)
 

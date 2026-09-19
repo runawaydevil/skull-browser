@@ -22,7 +22,11 @@ downloads.add_signal("download-location", function(_, filename, mime)
             error("Cannot create directory " .. dir)
         end
 
-        return dir .. filename
+        -- The name comes from the server, via Content-Disposition. Keep
+        -- only the last path component: a name carrying .. or a leading slash
+        -- would otherwise write anywhere the user can write, and downloads
+        -- overwrite silently.
+        return dir .. (filename:match("[^/]+$") or "download.pdf")
     end
 end)
 

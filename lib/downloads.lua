@@ -180,9 +180,11 @@ function _M.add(uri, opts)
                 suggested_filename)
         end
 
-        dd.allow_overwrite = true
-
         if fn then
+            -- Only overwrite where a handler or the user named the file. The
+            -- flag used to be set before this branch, so any computed path
+            -- clobbered an existing file with no prompt.
+            dd.allow_overwrite = true
             dd.destination = fn
             dd:add_signal("created-destination", function(ddd)
                 local data = {

@@ -216,7 +216,10 @@ local function formfiller_add (page, form)
     assert(type(form) == "dom_element" and form.tag_name == "FORM")
 
     local function to_lua_str(str)
-        return "'" .. str:gsub("([\\'])", "\\%1").. "'"
+        -- Escaping quote and backslash is not enough: a raw newline in a form
+        -- attribute is a syntax error in a Lua short string, and the broken
+        -- chunk is appended to the file, taking every stored credential with it.
+        return "'" .. str:gsub("([\\'])", "\\%1"):gsub("\n", "\\n"):gsub("\r", "\\r") .. "'"
     end
     local function to_lua_pat(str)
         return to_lua_str(lousy.util.lua_escape(str))
